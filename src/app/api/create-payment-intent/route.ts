@@ -1,20 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, PRICING_TIERS, CURRENCY, isTestMode } from '@/lib/stripe';
 
+type PricingTier = keyof typeof PRICING_TIERS;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { tier, userId } = body as { tier: keyof typeof PRICING_TIERS; userId?: string };
+    const { tier, userId } = body as { tier?: string; userId?: string };
 
     // Validate tier
-    if (!tier || !PRICING_TIERS[tier]) {
+    if (!tier || !(tier in PRICING_TIERS)) {
       return NextResponse.json(
         { error: 'Ungültiger Pricing Tier' },
         { status: 400 }
       );
     }
 
-    const tierInfo = PRICING_TIERS[tier];
+    const tierInfo = PRICING_TIERS[tier as PricingTier];
 
     // Free tier doesn't need payment
     if (tierInfo.price === 0) {
