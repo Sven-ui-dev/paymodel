@@ -4,7 +4,7 @@ import { stripe, PRICING_TIERS, CURRENCY, isTestMode } from '@/lib/stripe';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { tier, userId } = body;
+    const { tier, userId } = body as { tier: keyof typeof PRICING_TIERS; userId?: string };
 
     // Validate tier
     if (!tier || !PRICING_TIERS[tier]) {
