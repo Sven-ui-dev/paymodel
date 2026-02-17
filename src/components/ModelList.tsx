@@ -40,7 +40,8 @@ const capabilityColors: Record<string, string> = {
 export function ModelList({ models, onFavorite, favorites = [] }: ModelListProps) {
   const formatPrice = (price: number, currency: string) => {
     if (price === 0) return "Free";
-    return `$${price.toFixed(2)}/M`;
+    const symbol = currency === 'EUR' ? '€' : '$';
+    return `${symbol}${price.toFixed(2)}/M`;
   };
 
   const formatContext = (tokens: number) => {

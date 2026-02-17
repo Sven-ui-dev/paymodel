@@ -38,8 +38,12 @@ export function PriceCalculator({ models }: PriceCalculatorProps) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("de-DE", {
       style: "currency",
-      currency: "USD",
+      currency: "EUR",
     }).format(value);
+  };
+
+  const formatNumber = (num: number) => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
   const getCheapest = () => {
@@ -133,8 +137,8 @@ export function PriceCalculator({ models }: PriceCalculatorProps) {
         {inputTokenCount > 0 && outputTokenCount > 0 && (
           <div className="p-4 bg-slate-100 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              Gesamt: {inputTokenCount.toLocaleString()} Input +{" "}
-              {outputTokenCount.toLocaleString()} Output Tokens
+              Gesamt: {formatNumber(inputTokenCount)} Input +{" "}
+              {formatNumber(outputTokenCount)} Output Tokens
             </p>
             {getCheapest() && (
               <p className="text-sm mt-1">
