@@ -88,7 +88,7 @@ export function ModelList({ models, onFavorite, favorites = [] }: ModelListProps
                     <div>
                       <p className="font-medium">{model.model_name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {model.description?.slice(0, 60)}...
+                        {model.provider_name}
                       </p>
                     </div>
                   </TableCell>
