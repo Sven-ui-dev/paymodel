@@ -1,6 +1,6 @@
 /**
  * OpenRouter Price Updater
- * Fetches all models from OpenRouter and updates Supabase
+ * Fetches all models from OpenRouter, converts USD to EUR using daily exchange rate
  * 
  * Usage: node scripts/openrouter-updater.js
  * 
@@ -13,16 +13,54 @@ const https = require('https');
 // OpenRouter API - models endpoint (public, no auth needed)
 const OPENROUTER_API = 'https://openrouter.ai/api/v1/models';
 
+// Free exchange rate API (exchangerate-api.com - 1000 requests/month free)
+const EXCHANGE_API = 'https://api.exchangerate-api.com/v4/latest/USD';
+
 // Supabase connection
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
+// Exchange rate cache
+let exchangeRate = 0.95; // Default fallback rate (EUR per USD)
+
+// Fetch daily USD to EUR exchange rate
+async function fetchExchangeRate() {
+  return new Promise((resolve, reject) => {
+    console.log('💱 Fetching USD→EUR exchange rate...');
+    
+    const req = https.get(EXCHANGE_API, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const response = JSON.parse(data);
+          const rate = response.rates?.EUR || 0.95;
+          exchangeRate = rate;
+          console.log(`✅ Exchange rate: 1 USD = ${rate.toFixed(4)} EUR`);
+          resolve(rate);
+        } catch (e) {
+          console.warn(`⚠️ Failed to fetch exchange rate, using fallback: ${exchangeRate}`);
+          resolve(exchangeRate);
+        }
+      });
+    });
+    req.on('error', (e) => {
+      console.warn(`⚠️ Exchange rate fetch error: ${e.message}, using fallback: ${exchangeRate}`);
+      resolve(exchangeRate);
+    });
+    req.end();
+  });
+}
+
+// Convert USD to EUR
+function usdToEur(usdPrice) {
+  return usdPrice * exchangeRate;
+}
+
 // Clean Supabase URL - remove any trailing /rest/v1
 function getRestUrl(path) {
   let url = SUPABASE_URL;
-  // Remove trailing slashes
   url = url.replace(/\/+$/, '');
-  // Remove /rest/v1 if present
   url = url.replace(/\/rest\/v1$/, '');
   return `${url}/rest/v1${path}`;
 }
@@ -77,22 +115,6 @@ async function supabasePatch(path, body) {
   return httpRequest({ url: getRestUrl(path), method: 'PATCH' }, body);
 }
 
-// Provider name mapping
-const PROVIDER_MAP = {
-  'openai': 'OpenAI',
-  'anthropic': 'Anthropic',
-  'google': 'Google',
-  'deepseek': 'DeepSeek',
-  'mistral': 'Mistral AI',
-  'meta': 'Meta',
-  'xai': 'xAI',
-  'cohere': 'Cohere',
-  'perplexity': 'Perplexity',
-  'aws': 'AWS Bedrock',
-  'bedrock': 'AWS Bedrock',
-  'groq': 'Groq',
-};
-
 // Detect provider from model ID
 function detectProvider(modelId) {
   const id = modelId.toLowerCase();
@@ -112,7 +134,7 @@ function detectProvider(modelId) {
   return 'OpenRouter';
 }
 
-// Parse OpenRouter pricing
+// Parse OpenRouter pricing (returns USD, will be converted to EUR)
 function extractPricing(pricing) {
   if (!pricing) return { input: 0, output: 0 };
   const inputPrice = parseFloat(pricing.prompt || '0');
@@ -139,7 +161,6 @@ function fetchOpenRouterModels() {
         }
       });
     });
-    
     req.on('error', reject);
     req.end();
   });
@@ -205,13 +226,13 @@ async function upsertModel(providerId, name, slug, contextWindow, maxTokens, cap
   }
 }
 
-async function insertPrice(modelId, inputPrice, outputPrice) {
+async function insertPrice(modelId, inputPriceEur, outputPriceEur) {
   await supabasePost('/prices', {
     model_id: modelId,
-    input_price_per_million: inputPrice,
-    output_price_per_million: outputPrice,
+    input_price_per_million: Math.round(inputPriceEur * 10000) / 10000,
+    output_price_per_million: Math.round(outputPriceEur * 10000) / 10000,
     effective_date: new Date().toISOString().split('T')[0],
-    currency: 'USD'
+    currency: 'EUR'
   });
 }
 
@@ -224,7 +245,13 @@ async function updatePrices() {
       throw new Error('Missing Supabase credentials');
     }
     
+    // Fetch exchange rate first
+    await fetchExchangeRate();
+    
+    // Fetch models from OpenRouter
     const openrouterModels = await fetchOpenRouterModels();
+    
+    // Get existing data
     const existingProviders = await getExistingProviders();
     const existingModelSlugs = await getExistingModels();
     const latestPrices = await getLatestPrices();
@@ -233,11 +260,16 @@ async function updatePrices() {
     console.log(`📊 Existing models: ${existingModelSlugs.size}`);
     
     let newModels = 0, updatedPrices = 0, skipped = 0;
+    let totalUsdSaved = 0;
     
     for (const model of openrouterModels) {
       const id = model.id;
       const name = id.split('/').pop() || id;
-      const slug = id.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+      // Create clean slug from model ID
+      const slug = id.toLowerCase()
+        .replace(/[^a-z0-9-]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
       
       const capabilities = model.capabilities || [];
       const capsArray = [];
@@ -250,6 +282,10 @@ async function updatePrices() {
       const contextLength = model.context_length || model.max_tokens || 4096;
       const maxOutput = model.max_completion_tokens || model.max_tokens || 4096;
       const pricing = extractPricing(model.pricing);
+      
+      // Convert USD to EUR
+      const inputPriceEur = usdToEur(pricing.input);
+      const outputPriceEur = usdToEur(pricing.output);
       
       const providerName = detectProvider(id);
       const providerSlug = providerName.toLowerCase().replace(/[^a-z0-9]/g, '-');
@@ -268,9 +304,9 @@ async function updatePrices() {
       if (!modelExists) {
         const modelId = await upsertModel(providerId, name, slug, contextLength, maxOutput, capsArray);
         existingModelSlugs.add(slug);
-        await insertPrice(modelId, pricing.input, pricing.output);
+        await insertPrice(modelId, inputPriceEur, outputPriceEur);
         newModels++;
-        console.log(`🆕 New model: ${name} (${providerName}) - $${pricing.input}/$ ${pricing.output}`);
+        console.log(`🆕 ${name} (${providerName}): €${inputPriceEur.toFixed(4)}/€${outputPriceEur.toFixed(4)}`);
       } else {
         const existingModel = await supabaseGet(`/models?slug=eq.${slug}&select=id`);
         const modelId = existingModel?.[0]?.id;
@@ -279,13 +315,15 @@ async function updatePrices() {
           const oldInput = parseFloat(latestPrices[modelId].input_price_per_million || 0);
           const oldOutput = parseFloat(latestPrices[modelId].output_price_per_million || 0);
           
-          const inputChanged = Math.abs(oldInput - pricing.input) > 0.001;
-          const outputChanged = Math.abs(oldOutput - pricing.output) > 0.001;
+          const inputChanged = Math.abs(oldInput - inputPriceEur) > 0.0001;
+          const outputChanged = Math.abs(oldOutput - outputPriceEur) > 0.0001;
           
           if (inputChanged || outputChanged) {
-            await insertPrice(modelId, pricing.input, pricing.output);
+            await insertPrice(modelId, inputPriceEur, outputPriceEur);
             updatedPrices++;
-            console.log(`💰 Price update: ${name} - Input: $${oldInput.toFixed(2)}→$${pricing.input.toFixed(2)}, Output: $${oldOutput.toFixed(2)}→$${pricing.output.toFixed(2)}`);
+            const usdSaved = (Math.abs(oldInput - inputPriceEur) + Math.abs(oldOutput - outputPriceEur)) * 100;
+            totalUsdSaved += usdSaved;
+            console.log(`💰 ${name}: €${oldInput.toFixed(4)}→€${inputPriceEur.toFixed(4)} | €${oldOutput.toFixed(4)}→€${outputPriceEur.toFixed(4)}`);
           } else {
             skipped++;
           }
@@ -296,11 +334,19 @@ async function updatePrices() {
     }
     
     console.log('\n✅ Update complete!');
+    console.log(`   Exchange rate: 1 USD = ${exchangeRate.toFixed(4)} EUR`);
     console.log(`   New models: ${newModels}`);
     console.log(`   Price updates: ${updatedPrices}`);
     console.log(`   Skipped: ${skipped}`);
     
-    return { success: true, newModels, updatedPrices, skipped, totalModels: openrouterModels.length };
+    return { 
+      success: true, 
+      newModels, 
+      updatedPrices, 
+      skipped, 
+      exchangeRate,
+      totalModels: openrouterModels.length 
+    };
     
   } catch (error) {
     console.error('❌ Update failed:', error.message);
@@ -315,4 +361,4 @@ if (require.main === module) {
     .catch(error => { console.error('Fatal:', error); process.exit(1); });
 }
 
-module.exports = { updatePrices, fetchOpenRouterModels };
+module.exports = { updatePrices, fetchExchangeRate, usdToEur };
