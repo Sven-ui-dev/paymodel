@@ -9,15 +9,18 @@ export async function POST(request: NextRequest) {
     const { tier, userId } = body as { tier?: string; userId?: string };
 
     // Validate tier
+    // @ts-ignore
     const validTiers: PricingTier[] = ['free', 'pro', 'team'];
-    if (!tier || !validTiers.includes(tier as PricingTier)) {
+    // @ts-ignore
+    if (!tier || !validTiers.includes(tier)) {
       return NextResponse.json(
         { error: 'Ungültiger Pricing Tier' },
         { status: 400 }
       );
     }
 
-    const tierInfo = PRICING_TIERS[tier as PricingTier];
+    // @ts-ignore
+    const tierInfo = PRICING_TIERS[tier];
 
     // Free tier doesn't need payment
     if (tierInfo.price === 0) {
