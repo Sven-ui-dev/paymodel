@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe, PRICING_TIERS, CURRENCY, isTestMode } from '@/lib/stripe';
 
-type PricingTier = keyof typeof PRICING_TIERS;
+type PricingTier = 'free' | 'pro' | 'team';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +9,8 @@ export async function POST(request: NextRequest) {
     const { tier, userId } = body as { tier?: string; userId?: string };
 
     // Validate tier
-    if (!tier || !(tier in PRICING_TIERS)) {
+    const validTiers: PricingTier[] = ['free', 'pro', 'team'];
+    if (!tier || !validTiers.includes(tier as PricingTier)) {
       return NextResponse.json(
         { error: 'Ungültiger Pricing Tier' },
         { status: 400 }
