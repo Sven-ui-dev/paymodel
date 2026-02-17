@@ -82,6 +82,10 @@ export default function Home() {
     return costA - costB;
   });
 
+  // Stats
+  const modelCount = models.length;
+  const providerCount = providers.length;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -114,6 +118,21 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Stats Bar */}
+      <div className="bg-primary/5 border-b py-2">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center gap-8 text-sm">
+            <span className="font-semibold">{modelCount} AI-MODELLE</span>
+            <span className="text-muted-foreground">|</span>
+            <span className="font-semibold">{providerCount} ANBIETER</span>
+            <span className="text-muted-foreground">|</span>
+            <span className="font-semibold">24h PREIS-UPDATES</span>
+            <span className="text-muted-foreground">|</span>
+            <span className="font-semibold text-green-600">60% Ø EINSPARPOTENZIAL</span>
+          </div>
+        </div>
+      </div>
 
       <main>
         {/* Hero Section */}
