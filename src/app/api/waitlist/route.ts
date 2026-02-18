@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -42,7 +44,28 @@ export async function POST(request: Request) {
       );
     }
 
-    // Log for now (email sending can be added with Resend/SendGrid)
+    // Send confirmation email to user
+    if (process.env.RESEND_API_KEY) {
+      try {
+        await resend.emails.send({
+          from: 'paymodel.ai <waitlist@paymodel.ai>',
+          to: email,
+          subject: 'Bestätigung: Du bist auf der Early Access Warteliste!',
+          html: `
+            <h1>Vielen Dank!</h1>
+            <p>Du hast dich erfolgreich für den Early Access von paymodel.ai angemeldet.</p>
+            <p>Wir benachrichtigen dich, sobald du Zugang zum personalisierten Benchmark-Service erhältst.</p>
+            <br/>
+            <p>Dein paymodel.ai Team</p>
+          `
+        });
+        console.log('📧 Confirmation email sent to:', email);
+      } catch (emailError) {
+        console.error('Failed to send email:', emailError);
+      }
+    }
+
+    // Log new signup
     console.log('📧 New waitlist signup:', email);
 
     return NextResponse.json({ 

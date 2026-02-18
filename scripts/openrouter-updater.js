@@ -52,9 +52,9 @@ async function fetchExchangeRate() {
   });
 }
 
-// Convert USD to EUR
-function usdToEur(usdPrice) {
-  return usdPrice * exchangeRate;
+// Convert USD to EUR (extractPricing already returns per million USD)
+function usdToEur(usdPricePerMillion) {
+  return usdPricePerMillion * exchangeRate;
 }
 
 // Clean Supabase URL - remove any trailing /rest/v1
@@ -130,16 +130,31 @@ function detectProvider(modelId) {
   if (id.includes('sonar') || id.includes('perplexity')) return 'Perplexity';
   if (id.includes('nova') || id.includes('bedrock') || id.includes('amazon')) return 'AWS Bedrock';
   if (id.includes('groq') || id.includes('/groq')) return 'Groq';
+  if (id.includes('minimax')) return 'Minimax';
+  if (id.includes('moonshot') || id.includes('kimi')) return 'MoonshotAI';
+  if (id.includes('z-ai') || id.includes('z-') || id.includes('glm')) return 'Z-ai';
   
   return 'OpenRouter';
 }
 
-// Parse OpenRouter pricing (returns USD, will be converted to EUR)
+// Parse OpenRouter pricing (returns USD per million tokens)
 function extractPricing(pricing) {
   if (!pricing) return { input: 0, output: 0 };
-  const inputPrice = parseFloat(pricing.prompt || '0');
-  const outputPrice = parseFloat(pricing.completion || '0');
+  // OpenRouter pricing is per token, convert to per million tokens
+  const inputPrice = (parseFloat(pricing.prompt || '0')) * 1000000;
+  const outputPrice = (parseFloat(pricing.completion || '0')) * 1000000;
   return { input: inputPrice, output: outputPrice };
+}
+
+// Generate short slug from model ID
+function generateSlug(modelId) {
+  const name = modelId.split('/').pop() || modelId;
+  const slug = name.toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  // Truncate to 50 chars and remove trailing dashes
+  return slug.substring(0, 50).replace(/-+$/, '');
 }
 
 // Fetch models from OpenRouter
@@ -265,16 +280,17 @@ async function updatePrices() {
     for (const model of openrouterModels) {
       const id = model.id;
       const name = id.split('/').pop() || id;
-      // Create clean slug from model ID
-      const slug = id.toLowerCase()
-        .replace(/[^a-z0-9-]/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
+      // Create clean slug from model ID (max 50 chars)
+      const slug = generateSlug(id);
       
       const capabilities = model.capabilities || [];
+      const modalities = model.architecture?.input_modalities || [];
       const capsArray = [];
-      if (capabilities.includes('chat') || capabilities.includes('text')) capsArray.push('text');
-      if (capabilities.includes('vision') || capabilities.includes('images')) capsArray.push('vision');
+      
+      // Use architecture modalities if available, fallback to legacy capabilities
+      if (modalities.includes('text') || capabilities.includes('chat') || capabilities.includes('text')) capsArray.push('text');
+      if (modalities.includes('image') || capabilities.includes('vision') || capabilities.includes('images')) capsArray.push('vision');
+      if (modalities.includes('audio') || capabilities.includes('audio')) capsArray.push('audio');
       if (capabilities.includes('coding') || capabilities.includes('tools')) capsArray.push('coding');
       if (capabilities.includes('reasoning')) capsArray.push('reasoning');
       if (capsArray.length === 0) capsArray.push('text');
