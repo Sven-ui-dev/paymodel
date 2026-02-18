@@ -246,6 +246,45 @@ export default function Home() {
               Gib dein monatliches Volumen ein und sieh sofort, welches Modell für dich am günstigsten ist.
             </p>
 
+            {/* Preset Buttons */}
+            <div className="flex flex-wrap gap-2 mb-6 justify-center">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => { setCalculatorInput(100000); setCalculatorOutput(50000); }}
+              >
+                💬 Chatbot (150K)
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => { setCalculatorInput(500000); setCalculatorOutput(2000000); }}
+              >
+                ✍️ Content (2.5M)
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => { setCalculatorInput(2000000); setCalculatorOutput(1000000); }}
+              >
+                💻 Coding (3M)
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => { setCalculatorInput(5000000); setCalculatorOutput(3000000); }}
+                >
+                📊 Analytics (8M)
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => { setCalculatorInput(10000000); setCalculatorOutput(5000000); }}
+              >
+                🏢 Enterprise (15M)
+              </Button>
+            </div>
+
             <div className="bg-card rounded-xl p-6 shadow-sm">
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div>
