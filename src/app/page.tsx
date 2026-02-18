@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Toaster, toast } from "@/components/ui/sonner";
+import { Toaster, toast } from "sonner";
 import { ModelList } from "@/components/ModelList";
 import { PriceCalculator } from "@/components/PriceCalculator";
 import { SearchFilter } from "@/components/SearchFilter";
