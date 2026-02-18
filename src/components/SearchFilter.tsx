@@ -40,6 +40,11 @@ export function SearchFilter({
 
   const hasFilters = selectedProvider || localSearch;
 
+  // Sort providers alphabetically
+  const sortedProviders = [...providers].sort((a, b) => 
+    a.name.localeCompare(b.name, 'de')
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-4">
@@ -63,7 +68,7 @@ export function SearchFilter({
           >
             Alle
           </Button>
-          {providers.map((provider) => (
+          {sortedProviders.map((provider) => (
             <Button
               key={provider.id}
               variant={selectedProvider === provider.slug ? "default" : "outline"}
