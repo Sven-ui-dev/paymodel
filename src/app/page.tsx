@@ -196,7 +196,7 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredModels.slice(0, 15).map((model) => (
+                    {filteredModels.slice(0, 50).map((model) => (
                       <tr key={model.model_id} className="border-b hover:bg-muted/50">
                         <td className="p-3 font-medium">{model.model_name}</td>
                         <td className="p-3">
@@ -269,7 +269,7 @@ export default function Home() {
               </div>
 
               <div className="space-y-3">
-                {sortedModels.slice(0, 6).map((model, index) => {
+                {sortedModels.slice(0, 10).map((model, index) => {
                   const totalCost = calculateCost(model.input_price_per_million) + calculateCost(model.output_price_per_million);
                   return (
                     <div
