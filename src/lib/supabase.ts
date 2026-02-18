@@ -88,7 +88,7 @@ export async function getModels(filters?: { providerSlug?: string; useCaseSlug?:
   let query = supabase
     .from('current_prices')
     .select('*')
-    .order('model_name');
+    .order('popularity', { ascending: true, nullsFirst: true });
 
   if (filters?.providerSlug) {
     query = query.eq('provider_slug', filters.providerSlug);
