@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster, toast } from "@/components/ui/sonner";
 import { ModelList } from "@/components/ModelList";
 import { PriceCalculator } from "@/components/PriceCalculator";
 import { SearchFilter } from "@/components/SearchFilter";
@@ -22,6 +22,11 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [calculatorInput, setCalculatorInput] = useState(2500000);
   const [calculatorOutput, setCalculatorOutput] = useState(1000000);
+  
+  // Waitlist state
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [waitlistMessage, setWaitlistMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -69,6 +74,38 @@ export default function Home() {
       : [...favorites, modelId];
     setFavorites(newFavorites);
     localStorage.setItem("paymodel-favorites", JSON.stringify(newFavorites));
+  };
+
+  // Handle waitlist submission
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!waitlistEmail.trim()) return;
+    
+    setWaitlistLoading(true);
+    setWaitlistMessage(null);
+    
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: waitlistEmail }),
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        setWaitlistMessage({ type: 'success', text: 'Vielen Dank! Du bist auf der Warteliste.' });
+        toast.success('Angemeldet!', { description: 'Du bist auf der Early Access Warteliste.' });
+        setWaitlistEmail('');
+      } else {
+        setWaitlistMessage({ type: 'error', text: data.error || 'Ein Fehler ist aufgetreten.' });
+        toast.error('Fehler', { description: data.error || 'Etwas ist schiefgelaufen.' });
+      }
+    } catch (error) {
+      setWaitlistMessage({ type: 'error', text: 'Ein Fehler ist aufgetreten. Bitte später erneut versuchen.' });
+    } finally {
+      setWaitlistLoading(false);
+    }
   };
 
   // Calc costs for calculator
@@ -411,14 +448,25 @@ export default function Home() {
             <p className="text-muted-foreground mb-6">
               Sichere dir kostenlosen Zugang zum Preisvergleich und werde als Erster benachrichtigt, wenn der personalisierte Benchmark-Service startet.
             </p>
-            <div className="flex gap-2 justify-center">
+            <form onSubmit={handleWaitlistSubmit} className="flex gap-2 justify-center">
               <Input 
                 type="email" 
                 placeholder="Deine E-Mail-Adresse" 
                 className="max-w-xs"
+                value={waitlistEmail}
+                onChange={(e) => setWaitlistEmail(e.target.value)}
+                disabled={waitlistLoading}
+                required
               />
-              <Button>Anmelden</Button>
-            </div>
+              <Button type="submit" disabled={waitlistLoading}>
+                {waitlistLoading ? '...' : 'Anmelden'}
+              </Button>
+            </form>
+            {waitlistMessage && (
+              <p className={`text-sm mt-3 ${waitlistMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                {waitlistMessage.text}
+              </p>
+            )}
             <p className="text-xs text-muted-foreground mt-3">
               Kein Spam. Abmeldung jederzeit.
             </p>
