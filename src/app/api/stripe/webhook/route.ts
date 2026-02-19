@@ -1,15 +1,18 @@
-export const dynamic = 'force-dynamic';
-
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-01-28.clover',
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+// Simple Supabase client for server-side operations
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -25,25 +28,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    const cookieStore = await cookies();
-    
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          },
-        },
-      }
-    );
-
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -70,6 +54,9 @@ export async function POST(request: Request) {
                 updated_at: new Date().toISOString(),
               })
               .eq('id', profiles.id);
+            console.log(`Updated profile for ${email} to ${planName}`);
+          } else {
+            console.log(`No profile found for email: ${email}`);
           }
         }
         break;
@@ -89,6 +76,7 @@ export async function POST(request: Request) {
         if (profiles) {
           const status = subscription.status === 'active' ? 'active' : 'inactive';
           const periodEnd = (subscription as any).current_period_end || subscription.billing_cycle_anchor;
+          
           await supabase
             .from('profiles')
             .update({
@@ -109,6 +97,9 @@ export async function POST(request: Request) {
             period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
             period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
           });
+          console.log(`Updated subscription for customer ${customerId}`);
+        } else {
+          console.log(`No profile found for customer: ${customerId}`);
         }
         break;
       }
@@ -134,6 +125,9 @@ export async function POST(request: Request) {
         }
         break;
       }
+
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
