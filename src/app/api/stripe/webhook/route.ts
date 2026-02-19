@@ -86,24 +86,26 @@ export async function POST(request: Request) {
 
         if (profiles) {
           const status = subscription.status === 'active' ? 'active' : 'inactive';
+          const periodEnd = (subscription as any).current_period_end || subscription.billing_cycle_anchor;
           await supabase
             .from('profiles')
             .update({
               subscription_status: status,
               subscription_plan: subscription.metadata?.planName || 'pro',
-              current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+              current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
               updated_at: new Date().toISOString(),
             })
             .eq('id', profiles.id);
 
+          const periodStart = (subscription as any).current_period_start || subscription.billing_cycle_anchor;
           await supabase.from('subscription_history').insert({
             user_id: profiles.id,
             stripe_subscription_id: subscription.id,
             plan: subscription.metadata?.planName || 'pro',
             status,
             amount: subscription.items.data[0]?.price.unit_amount || 0,
-            period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
+            period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
           });
         }
         break;
