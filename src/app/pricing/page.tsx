@@ -31,12 +31,12 @@ const PLANS = [
       'Export-Funktionen',
       'Priority Support',
     ],
-    priceId: 'price_1T2UBVAwdEweUSNveqIRiSE2',
+    priceId: 'price_1T2X6dAwdEweUSNvrHZoUFCd',
     highlight: true,
   },
   {
     name: 'Business',
-    price: '29',
+    price: '49',
     period: '/Monat',
     description: 'Für Teams',
     features: [
@@ -46,7 +46,7 @@ const PLANS = [
       'Custom Integrations',
       'Dedizierter Support',
     ],
-    priceId: 'price_1T2UFEAwdEweUSNvkKOoPJSQ',
+    priceId: 'price_1T2X7JAwdEweUSNv895ASmpq',
     highlight: false,
   },
 ];
