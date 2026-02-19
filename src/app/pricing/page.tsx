@@ -1,164 +1,197 @@
-'use client';
+import { createClient } from '@/lib/supabase/server';
+import { Check } from 'lucide-react';
+import Link from 'next/link';
 
-import { useState } from 'react';
-import { PRICING_TIERS, isTestMode } from '@/lib/stripe';
-import CheckoutForm from '@/components/Checkout';
+const PLANS = [
+  {
+    name: 'Free',
+    price: '0',
+    period: '/Monat',
+    description: 'Für Einsteiger',
+    features: [
+      'Preisvergleich aller Modelle',
+      'Kostenrechner',
+      '10 Modelle speichern',
+    ],
+    priceId: null,
+    highlight: false,
+  },
+  {
+    name: 'Pro',
+    price: '19',
+    period: '/Monat',
+    description: 'Für Power-User',
+    features: [
+      'Alles aus Free',
+      'Unbegrenzte Modelle speichern',
+      'Preis-Alerts',
+      'Export-Funktionen',
+      'Priority Support',
+    ],
+    priceId: 'price_1T2UBVAwdEweUSNveqIRiSE2',
+    highlight: true,
+  },
+  {
+    name: 'Business',
+    price: '29',
+    period: '/Monat',
+    description: 'Für Teams',
+    features: [
+      'Alles aus Pro',
+      'Team-Funktionen',
+      'API-Zugang',
+      'Custom Integrations',
+      'Dedizierter Support',
+    ],
+    priceId: 'price_1T2UFEAwdEweUSNvkKOoPJSQ',
+    highlight: false,
+  },
+];
 
-export default function PricingPage() {
-  const [selectedTier, setSelectedTier] = useState<'free' | 'pro' | 'team' | null>(null);
-  const [showCheckout, setShowCheckout] = useState(false);
+export default async function PricingPage() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const handleSelectTier = (tier: 'free' | 'pro' | 'team') => {
-    if (tier === 'free') {
-      // Free tier - no payment needed
-      alert('Du hast den Free Tier ausgewählt! Keine Zahlung erforderlich.');
-      return;
-    }
-    setSelectedTier(tier);
-    setShowCheckout(true);
-  };
+  // Get user profile if logged in
+  let profile = null;
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    profile = data;
+  }
 
-  const handleSuccess = () => {
-    alert('Zahlung erfolgreich! Willkommen beim ' + PRICING_TIERS[selectedTier!].name + ' Plan.');
-    setShowCheckout(false);
-    setSelectedTier(null);
-  };
-
-  const handleCancel = () => {
-    setShowCheckout(false);
-    setSelectedTier(null);
-  };
-
-  if (showCheckout && selectedTier) {
-    return (
-      <div className="min-h-screen bg-gray-100 py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Test Mode Banner */}
-          {isTestMode && (
-            <div className="mb-6 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🧪</span>
-                <div>
-                  <h2 className="font-bold text-yellow-800">Stripe Sandbox aktiv</h2>
-                  <p className="text-yellow-700 text-sm">
-                    Test-Modus - keine echten Zahlungen werden verarbeitet
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <CheckoutForm
-            tier={selectedTier}
-            onSuccess={handleSuccess}
-            onCancel={handleCancel}
-          />
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b sticky top-0 bg-background/95 backdrop-blur z-10">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="font-bold text-xl">
+              paymodel.ai
+            </Link>
+            <nav className="flex items-center gap-4">
+              {user ? (
+                <Link href="/dashboard" className="text-sm font-medium">
+                  Dashboard
+                </Link>
+              ) : (
+                <Link href="/login" className="text-sm font-medium">
+                  Login
+                </Link>
+              )}
+            </nav>
+          </div>
         </div>
-      </div>
+      </header>
+
+      <main className="py-16 px-4">
+        <div className="container mx-auto max-w-5xl">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4">
+              Wähle deinen Plan
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              Flexible Preise für jeden Bedarf
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {PLANS.map((plan) => (
+              <div
+                key={plan.name}
+                className={`rounded-xl p-6 ${
+                  plan.highlight
+                    ? 'bg-primary/10 border-2 border-primary'
+                    : 'bg-card border'
+                }`}
+              >
+                {plan.highlight && (
+                  <div className="text-xs font-medium text-primary mb-2">
+                    Populär
+                  </div>
+                )}
+                
+                <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {plan.description}
+                </p>
+                
+                <div className="mb-6">
+                  <span className="text-4xl font-bold">€{plan.price}</span>
+                  <span className="text-muted-foreground">{plan.period}</span>
+                </div>
+
+                <ul className="space-y-3 mb-6">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2 text-sm">
+                      <Check className="w-4 h-4 text-green-500" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                {plan.priceId ? (
+                  <CheckoutButton
+                    priceId={plan.priceId}
+                    planName={plan.name.toLowerCase()}
+                    email={user?.email || ''}
+                    currentPlan={profile?.subscription_plan}
+                  />
+                ) : (
+                  <Link
+                    href={user ? '/dashboard' : '/login'}
+                    className="block w-full text-center py-2 px-4 rounded-lg border hover:bg-muted transition"
+                  >
+                    {user ? 'Aktiviert' : 'Loslegen'}
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function CheckoutButton({
+  priceId,
+  planName,
+  email,
+  currentPlan,
+}: {
+  priceId: string;
+  planName: string;
+  email: string;
+  currentPlan?: string;
+}) {
+  const isCurrentPlan = currentPlan === planName;
+
+  if (isCurrentPlan) {
+    return (
+      <Link
+        href="/dashboard"
+        className="block w-full text-center py-2 px-4 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition"
+      >
+        Aktueller Plan
+      </Link>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      {/* Test Mode Banner */}
-      {isTestMode && (
-        <div className="max-w-6xl mx-auto mb-8 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🧪</span>
-            <span className="font-bold text-yellow-800">Stripe Sandbox aktiv</span>
-          </div>
-        </div>
-      )}
-
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold text-center text-gray-900 mb-4">
-          Wähle deinen Plan
-        </h1>
-        <p className="text-xl text-gray-600 text-center mb-12">
-          Einfache, transparente Preisgestaltung für deine Anforderungen
-        </p>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Free Tier */}
-          <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              {PRICING_TIERS.free.name}
-            </h3>
-            <p className="text-4xl font-bold text-blue-600 mb-6">
-              €0<span className="text-base font-normal text-gray-500">/Monat</span>
-            </p>
-            <ul className="space-y-3 mb-8">
-              {PRICING_TIERS.free.features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span>
-                  <span className="text-gray-700">{feature}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => handleSelectTier('free')}
-              className="w-full py-3 px-4 bg-gray-200 text-gray-900 font-semibold rounded-md hover:bg-gray-300 transition"
-            >
-              Aktueller Plan
-            </button>
-          </div>
-
-          {/* Pro Tier */}
-          <div className="bg-white rounded-lg shadow-xl p-6 border-2 border-blue-500 transform scale-105">
-            <div className="absolute top-0 right-0 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">
-              BELIEBT
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              {PRICING_TIERS.pro.name}
-            </h3>
-            <p className="text-4xl font-bold text-blue-600 mb-6">
-              €{(PRICING_TIERS.pro.price / 100).toFixed(0)}<span className="text-base font-normal text-gray-500">/Monat</span>
-            </p>
-            <ul className="space-y-3 mb-8">
-              {PRICING_TIERS.pro.features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span>
-                  <span className="text-gray-700">{feature}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => handleSelectTier('pro')}
-              className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition"
-            >
-              Upgrade zu Pro
-            </button>
-          </div>
-
-          {/* Team Tier */}
-          <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              {PRICING_TIERS.team.name}
-            </h3>
-            <p className="text-4xl font-bold text-blue-600 mb-6">
-              €{(PRICING_TIERS.team.price / 100).toFixed(0)}<span className="text-base font-normal text-gray-500">/Monat</span>
-            </p>
-            <ul className="space-y-3 mb-8">
-              {PRICING_TIERS.team.features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span>
-                  <span className="text-gray-700">{feature}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => handleSelectTier('team')}
-              className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition"
-            >
-              Upgrade zu Team
-            </button>
-          </div>
-        </div>
-
-        <p className="text-center text-gray-500 mt-8 text-sm">
-          Alle Preise in EUR. Jederzeit kündbar.
-        </p>
-      </div>
-    </div>
+    <form action="/api/stripe/checkout" method="POST">
+      <input type="hidden" name="email" value={email} />
+      <input type="hidden" name="priceId" value={priceId} />
+      <input type="hidden" name="planName" value={planName} />
+      <button
+        type="submit"
+        className="w-full py-2 px-4 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition"
+      >
+        {email ? 'Upgrade' : 'Registrieren'}
+      </button>
+    </form>
   );
 }
