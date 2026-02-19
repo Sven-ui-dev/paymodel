@@ -187,24 +187,28 @@ export function PriceCalculator({ models }: PriceCalculatorProps) {
               Gesamt: {formatNumber(inputTokenCount)} Input +{" "}
               {formatNumber(outputTokenCount)} Output Tokens
             </p>
-            {getCheapest() && (
-              <p className="text-sm mt-1">
-                💡 Empfehlung: <strong>{getCheapest()?.model_name}</strong> für{" "}
-                <strong>{formatCurrency(getCheapest()?.totalCost || 0)}</strong>
-                {getCheapest()?.capabilities && getCheapest()?.capabilities!.length > 0 && (
-                  <span className="ml-2 flex gap-1 inline-flex">
-                    {getCheapest()?.capabilities!.map((cap) => (
-                      <span
-                        key={cap}
-                        className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs border ${capabilityColors[cap] || 'bg-gray-100'}`}
-                      >
-                        {capabilityIcons[cap]}
-                      </span>
-                    ))}
-                  </span>
-                )}
-              </p>
-            )}
+            {(() => {
+              const cheapest = getCheapest();
+              if (!cheapest) return null;
+              return (
+                <p className="text-sm mt-1">
+                  💡 Empfehlung: <strong>{cheapest.model_name}</strong> für{" "}
+                  <strong>{formatCurrency(cheapest.totalCost)}</strong>
+                  {cheapest.capabilities && cheapest.capabilities.length > 0 && (
+                    <span className="ml-2 flex gap-1 inline-flex">
+                      {cheapest.capabilities.map((cap) => (
+                        <span
+                          key={cap}
+                          className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs border ${capabilityColors[cap] || 'bg-gray-100'}`}
+                        >
+                          {capabilityIcons[cap]}
+                        </span>
+                      ))}
+                    </span>
+                  )}
+                </p>
+              );
+            })()}
           </div>
         )}
       </CardContent>
