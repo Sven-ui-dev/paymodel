@@ -1,18 +1,146 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
+import {
+  generateWelcomeEmailContent,
+  generatePaymentConfirmationEmailContent,
+  generatePaymentFailedEmailContent,
+  generateSubscriptionRenewedEmailContent,
+} from '@/components/email';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-01-28.clover',
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 // Simple Supabase client for server-side operations
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+async function sendWelcomeEmail(email: string, planName: string) {
+  try {
+    const { subject, html, text } = generateWelcomeEmailContent({
+      firstName: undefined,
+      planName: planName as 'pro' | 'business',
+      loginUrl: `${appUrl}/dashboard`,
+      supportUrl: 'mailto:support@paymodel.ai',
+    });
+
+    await resend.emails.send({
+      from: 'paymodel.ai <waitlist@paymodel.ai>',
+      to: [email],
+      subject,
+      html,
+      text,
+    });
+    console.log(`Welcome email sent to ${email}`);
+  } catch (error) {
+    console.error(`Failed to send welcome email to ${email}:`, error);
+  }
+}
+
+async function sendPaymentConfirmationEmail(
+  email: string,
+  amount: number,
+  currency: string,
+  planName: string,
+  invoiceUrl: string,
+  invoiceNumber: string
+) {
+  try {
+    const { subject, html, text } = generatePaymentConfirmationEmailContent({
+      firstName: undefined,
+      amount,
+      currency,
+      planName,
+      invoiceUrl,
+      invoiceNumber,
+      paymentDate: new Date().toLocaleDateString('de-DE'),
+      nextBillingDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('de-DE'),
+    });
+
+    await resend.emails.send({
+      from: 'paymodel.ai <waitlist@paymodel.ai>',
+      to: [email],
+      subject,
+      html,
+      text,
+    });
+    console.log(`Payment confirmation email sent to ${email}`);
+  } catch (error) {
+    console.error(`Failed to send payment confirmation email to ${email}:`, error);
+  }
+}
+
+async function sendPaymentFailedEmail(
+  email: string,
+  amount: number,
+  currency: string,
+  planName: string,
+  nextBillingDate: string
+) {
+  try {
+    const { subject, html, text } = generatePaymentFailedEmailContent({
+      firstName: undefined,
+      amount,
+      currency,
+      planName,
+      nextBillingDate,
+      dashboardUrl: `${appUrl}/dashboard`,
+      supportUrl: 'mailto:support@paymodel.ai',
+    });
+
+    await resend.emails.send({
+      from: 'paymodel.ai <waitlist@paymodel.ai>',
+      to: [email],
+      subject,
+      html,
+      text,
+    });
+    console.log(`Payment failed email sent to ${email}`);
+  } catch (error) {
+    console.error(`Failed to send payment failed email to ${email}:`, error);
+  }
+}
+
+async function sendSubscriptionRenewedEmail(
+  email: string,
+  amount: number,
+  currency: string,
+  planName: string,
+  currentPeriodEnd: string,
+  nextBillingDate: string
+) {
+  try {
+    const { subject, html, text } = generateSubscriptionRenewedEmailContent({
+      firstName: undefined,
+      amount,
+      currency,
+      planName,
+      currentPeriodEnd,
+      nextBillingDate,
+      dashboardUrl: `${appUrl}/dashboard`,
+    });
+
+    await resend.emails.send({
+      from: 'paymodel.ai <waitlist@paymodel.ai>',
+      to: [email],
+      subject,
+      html,
+      text,
+    });
+    console.log(`Subscription renewed email sent to ${email}`);
+  } catch (error) {
+    console.error(`Failed to send subscription renewed email to ${email}:`, error);
+  }
+}
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -55,6 +183,30 @@ export async function POST(request: Request) {
               })
               .eq('id', profiles.id);
             console.log(`Updated profile for ${email} to ${planName}`);
+
+            // Send welcome and payment confirmation emails
+            await sendWelcomeEmail(email, planName);
+            
+            // Try to get invoice details for payment confirmation
+            try {
+              if (subscriptionId) {
+                const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+                const latestInvoiceId = subscription.latest_invoice as string;
+                if (latestInvoiceId) {
+                  const invoice = await stripe.invoices.retrieve(latestInvoiceId);
+                  await sendPaymentConfirmationEmail(
+                    email,
+                    invoice.amount_paid,
+                    invoice.currency,
+                    planName,
+                    invoice.invoice_pdf || `${appUrl}/dashboard`,
+                    invoice.number || 'INV-001'
+                  );
+                }
+              }
+            } catch (invoiceError) {
+              console.error('Failed to send payment confirmation email:', invoiceError);
+            }
           } else {
             console.log(`No profile found for email: ${email}`);
           }
@@ -69,13 +221,14 @@ export async function POST(request: Request) {
         
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, email')
           .eq('stripe_customer_id', customerId)
           .single();
 
         if (profiles) {
           const status = subscription.status === 'active' ? 'active' : 'inactive';
           const periodEnd = (subscription as any).current_period_end || subscription.billing_cycle_anchor;
+          const previousAttributes = event.data.previous_attributes as any;
           
           await supabase
             .from('profiles')
@@ -98,6 +251,25 @@ export async function POST(request: Request) {
             period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
           });
           console.log(`Updated subscription for customer ${customerId}`);
+
+          // Send subscription renewed email if it was a renewal (status changed from past_due to active)
+          if (event.type === 'customer.subscription.updated' && status === 'active') {
+            const wasPastDue = previousAttributes?.status === 'past_due';
+            if (!wasPastDue && profiles.email) {
+              const amount = subscription.items.data[0]?.price.unit_amount || 0;
+              const nextBillingDate = new Date(periodEnd * 1000).toLocaleDateString('de-DE');
+              const currentPeriodEnd = new Date(periodEnd * 1000).toLocaleDateString('de-DE');
+              
+              await sendSubscriptionRenewedEmail(
+                profiles.email,
+                amount,
+                subscription.currency || 'eur',
+                subscription.metadata?.planName || 'pro',
+                currentPeriodEnd,
+                nextBillingDate
+              );
+            }
+          }
         } else {
           console.log(`No profile found for customer: ${customerId}`);
         }
@@ -110,7 +282,7 @@ export async function POST(request: Request) {
         
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, email')
           .eq('stripe_customer_id', customerId)
           .single();
 
@@ -122,6 +294,21 @@ export async function POST(request: Request) {
               updated_at: new Date().toISOString(),
             })
             .eq('id', profiles.id);
+
+          // Send payment failed email
+          if (profiles.email) {
+            const nextBillingDate = invoice.next_payment_attempt
+              ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString('de-DE')
+              : 'so bald wie möglich';
+              
+            await sendPaymentFailedEmail(
+              profiles.email,
+              invoice.amount_due,
+              invoice.currency,
+              'pro', // Default to pro, should be retrieved from profile
+              nextBillingDate
+            );
+          }
         }
         break;
       }
