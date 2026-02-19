@@ -13,12 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Heart, ExternalLink, Code, Brain, Eye, Globe, FileText, Mic } from "lucide-react";
+import { Heart, ExternalLink, Code, Brain, Eye, Globe, FileText, Mic, Bell } from "lucide-react";
+import { CreatePriceAlertModal } from "./CreatePriceAlertModal";
 
 interface ModelListProps {
   models: CurrentPrice[];
   onFavorite?: (modelId: string) => void;
   favorites?: string[];
+  userId?: string;
 }
 
 const capabilityIcons: Record<string, React.ReactNode> = {
@@ -39,7 +41,10 @@ const capabilityColors: Record<string, string> = {
   audio: "bg-pink-100 text-pink-800 border-pink-300",
 };
 
-export function ModelList({ models, onFavorite, favorites = [] }: ModelListProps) {
+export function ModelList({ models, onFavorite, favorites = [], userId }: ModelListProps) {
+  const [selectedModel, setSelectedModel] = useState<CurrentPrice | null>(null);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+
   const formatPrice = (price: number, currency: string) => {
     if (price === 0) return "Free";
     const symbol = currency === 'EUR' ? '€' : '$';
@@ -50,6 +55,11 @@ export function ModelList({ models, onFavorite, favorites = [] }: ModelListProps
     if (tokens >= 1000000) return `${(tokens / 1000000).toFixed(0)}M`;
     if (tokens >= 1000) return `${(tokens / 1000).toFixed(0)}K`;
     return tokens.toString();
+  };
+
+  const handleCreateAlert = (model: CurrentPrice) => {
+    setSelectedModel(model);
+    setIsAlertModalOpen(true);
   };
 
   if (models.length === 0) {
@@ -63,93 +73,117 @@ export function ModelList({ models, onFavorite, favorites = [] }: ModelListProps
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Modelle ({models.length})</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[200px]">Modell</TableHead>
-              <TableHead>Provider</TableHead>
-              <TableHead>Preis (Input/Output)</TableHead>
-              <TableHead>Context</TableHead>
-              <TableHead>Capabilities</TableHead>
-              <TableHead className="w-[100px]">Aktionen</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {models.map((model) => {
-              const isFavorite = favorites.includes(model.model_id);
-              return (
-                <TableRow key={model.model_id}>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{model.model_name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {model.provider_name}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{model.provider_name}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      <p>📥 {formatPrice(model.input_price_per_million, model.currency)}</p>
-                      <p>📤 {formatPrice(model.output_price_per_million, model.currency)}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">
-                      {formatContext(model.context_window)} tokens
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1 flex-wrap">
-                      {model.capabilities?.map((cap: string) => (
-                        <span
-                          key={cap}
-                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border ${capabilityColors[cap] || "bg-gray-100 text-gray-800 border-gray-300"}`}
-                          title={cap}
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Modelle ({models.length})</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[200px]">Modell</TableHead>
+                <TableHead>Provider</TableHead>
+                <TableHead>Preis (Input/Output)</TableHead>
+                <TableHead>Context</TableHead>
+                <TableHead>Capabilities</TableHead>
+                <TableHead className="w-[140px]">Aktionen</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {models.map((model) => {
+                const isFavorite = favorites.includes(model.model_id);
+                return (
+                  <TableRow key={model.model_id}>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{model.model_name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {model.provider_name}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{model.provider_name}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <p>📥 {formatPrice(model.input_price_per_million, model.currency)}</p>
+                        <p>📤 {formatPrice(model.output_price_per_million, model.currency)}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">
+                        {formatContext(model.context_window)} tokens
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1 flex-wrap">
+                        {model.capabilities?.map((cap: string) => (
+                          <span
+                            key={cap}
+                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border ${capabilityColors[cap] || "bg-gray-100 text-gray-800 border-gray-300"}`}
+                            title={cap}
+                          >
+                            {capabilityIcons[cap]}
+                            <span className="capitalize">{cap}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        {userId && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleCreateAlert(model)}
+                            title="Preis-Alert erstellen"
+                          >
+                            <Bell className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onFavorite?.(model.model_id)}
+                          title={isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten"}
                         >
-                          {capabilityIcons[cap]}
-                          <span className="capitalize">{cap}</span>
-                        </span>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onFavorite?.(model.model_id)}
-                        title={isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten"}
-                      >
-                        <Heart className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`} />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        asChild
-                        title="Zum Provider"
-                      >
-                        <a href={model.affiliate_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+                          <Heart className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          asChild
+                          title="Zum Provider"
+                        >
+                          <a href={model.affiliate_url} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {selectedModel && userId && (
+        <CreatePriceAlertModal
+          isOpen={isAlertModalOpen}
+          onClose={() => {
+            setIsAlertModalOpen(false);
+            setSelectedModel(null);
+          }}
+          model={selectedModel}
+          userId={userId}
+        />
+      )}
+    </>
   );
 }

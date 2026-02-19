@@ -72,6 +72,25 @@ export type CurrentPrice = {
   capabilities: string[];
 };
 
+export type PriceAlert = {
+  id: string;
+  user_id: string;
+  model_id: string;
+  target_price: number;
+  current_price: number | null;
+  is_active: boolean;
+  is_triggered: boolean;
+  created_at: string;
+  triggered_at: string | null;
+};
+
+export type PriceAlertWithDetails = PriceAlert & {
+  model_name: string;
+  model_slug: string;
+  provider_name: string;
+  provider_slug: string;
+};
+
 // API Functions
 export async function getProviders() {
   const { data, error } = await supabase
