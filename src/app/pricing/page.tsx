@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { useState } from 'react';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
 
@@ -168,6 +169,7 @@ function CheckoutButton({
   email: string;
   currentPlan?: string;
 }) {
+  const [loading, setLoading] = useState(false);
   const isCurrentPlan = currentPlan === planName;
 
   if (isCurrentPlan) {
@@ -181,17 +183,39 @@ function CheckoutButton({
     );
   }
 
+  const handleCheckout = async () => {
+    if (!email) {
+      window.location.href = '/login';
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, priceId, planName }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || 'Fehler beim Checkout');
+      }
+    } catch (error) {
+      alert('Fehler beim Checkout');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <form action="/api/stripe/checkout" method="POST">
-      <input type="hidden" name="email" value={email} />
-      <input type="hidden" name="priceId" value={priceId} />
-      <input type="hidden" name="planName" value={planName} />
-      <button
-        type="submit"
-        className="w-full py-2 px-4 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition"
-      >
-        {email ? 'Upgrade' : 'Registrieren'}
-      </button>
-    </form>
+    <button
+      onClick={handleCheckout}
+      disabled={loading}
+      className="w-full py-2 px-4 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition disabled:opacity-50"
+    >
+      {loading ? 'Lädt...' : email ? 'Upgrade' : 'Registrieren'}
+    </button>
   );
 }
