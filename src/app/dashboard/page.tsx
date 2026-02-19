@@ -6,8 +6,18 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, CreditCard, Settings, LogOut, Crown } from "lucide-react";
+import { Loader2, CreditCard, LogOut, Crown, Calendar, CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
+
+// Helper function to format date
+const formatDate = (dateString?: string) => {
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleDateString("de-DE", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
 
 interface Profile {
   id: string;
@@ -15,6 +25,7 @@ interface Profile {
   subscription_plan: string;
   subscription_status: string;
   stripe_customer_id?: string;
+  current_period_end?: string;
 }
 
 export default function DashboardPage() {
@@ -136,6 +147,13 @@ export default function DashboardPage() {
     business: "bg-purple-500",
   };
 
+  // Plan prices map
+  const planPrices: Record<string, string> = {
+    free: "€0/Monat",
+    pro: "€19/Monat",
+    business: "€29/Monat",
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -161,37 +179,61 @@ export default function DashboardPage() {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
 
-        {/* Profile Card */}
+        {/* Profile Card - Subscription Status */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Settings className="w-5 h-5" />
-              Konto
+              <Crown className="w-5 h-5" />
+              Subscription
             </CardTitle>
+            <CardDescription>
+              Dein aktueller Abo-Status und Plan-Details
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">E-Mail</p>
-                <p className="font-medium">{user?.email}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Plan</p>
-                <Badge className={planColors[profile?.subscription_plan || "free"]}>
-                  {profile?.subscription_plan === "pro" && <Crown className="w-3 h-3 mr-1" />}
-                  {(profile?.subscription_plan || "free").toUpperCase()}
-                </Badge>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div>
-                <p className="text-sm text-muted-foreground">Status</p>
-                <Badge variant={profile?.subscription_status === "active" ? "default" : "secondary"}>
-                  {profile?.subscription_status === "active" ? "Aktiv" : "Inaktiv"}
-                </Badge>
+          <CardContent className="space-y-6">
+            {/* Plan & Status Row */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Aktueller Plan</p>
+                  <div className="flex items-center gap-2">
+                    <Badge className={planColors[profile?.subscription_plan || "free"]}>
+                      {profile?.subscription_plan === "pro" && <Crown className="w-3 h-3 mr-1" />}
+                      {(profile?.subscription_plan || "free").toUpperCase()}
+                    </Badge>
+                    <span className="text-lg font-semibold">{planPrices[profile?.subscription_plan || "free"]}</span>
+                  </div>
+                </div>
               </div>
               
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Status</p>
+                  <Badge variant={profile?.subscription_status === "active" ? "default" : "secondary"}>
+                    {profile?.subscription_status === "active" ? (
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                    ) : (
+                      <AlertCircle className="w-3 h-3 mr-1" />
+                    )}
+                    {profile?.subscription_status === "active" ? "Aktiv" : "Inaktiv"}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Renewal Date */}
+            {(profile?.subscription_plan === "pro" || profile?.subscription_plan === "business") && (
+              <div className="flex items-center gap-3 p-4 border rounded-lg">
+                <Calendar className="w-5 h-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Nächste Abrechnung</p>
+                  <p className="font-medium">{formatDate(profile?.current_period_end)}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
               {profile?.subscription_status === "active" ? (
                 <Button onClick={handleManageSubscription} disabled={manageLoading}>
                   {manageLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <CreditCard className="w-4 h-4 mr-2" />}
@@ -199,9 +241,15 @@ export default function DashboardPage() {
                 </Button>
               ) : (
                 <Link href="/pricing">
-                  <Button>Upgrade</Button>
+                  <Button>Jetzt upgraden</Button>
                 </Link>
               )}
+              
+              <Link href="/pricing">
+                <Button variant="outline">
+                  Alle Pläne ansehen
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
