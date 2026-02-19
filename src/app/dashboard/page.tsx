@@ -29,6 +29,7 @@ import {
   Clock,
   RefreshCw,
   LucideProps,
+  PieChart,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -531,7 +532,7 @@ export default function DashboardPage() {
         )}
 
         {/* Info Cards Grid */}
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-3 gap-4">
           <Card className="group hover:border-primary/30 transition-colors cursor-pointer" onClick={() => router.push("/")}>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -542,6 +543,23 @@ export default function DashboardPage() {
                   <h3 className="font-semibold mb-1">Preise vergleichen</h3>
                   <p className="text-sm text-muted-foreground">
                     Alle AI-Modelle im direkten Vergleich
+                  </p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="group hover:border-primary/30 transition-colors cursor-pointer" onClick={() => router.push("/dashboard/stats")}>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                  <PieChart className="w-6 h-6 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold mb-1">Nutzungs-Statistiken</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Deine Aktivität und Einsparungen
                   </p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
