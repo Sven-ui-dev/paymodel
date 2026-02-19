@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Heart, ExternalLink, Code, Brain, Eye, Globe, FileText } from "lucide-react";
+import { Heart, ExternalLink, Code, Brain, Eye, Globe, FileText, Mic } from "lucide-react";
 
 interface ModelListProps {
   models: CurrentPrice[];
@@ -22,19 +22,21 @@ interface ModelListProps {
 }
 
 const capabilityIcons: Record<string, React.ReactNode> = {
-  text: <FileText className="w-4 h-4" />,
-  coding: <Code className="w-4 h-4" />,
-  reasoning: <Brain className="w-4 h-4" />,
-  vision: <Eye className="w-4 h-4" />,
-  translation: <Globe className="w-4 h-4" />,
+  text: <FileText className="w-3 h-3" />,
+  coding: <Code className="w-3 h-3" />,
+  reasoning: <Brain className="w-3 h-3" />,
+  vision: <Eye className="w-3 h-3" />,
+  translation: <Globe className="w-3 h-3" />,
+  audio: <Mic className="w-3 h-3" />,
 };
 
 const capabilityColors: Record<string, string> = {
-  text: "bg-blue-100 text-blue-800",
-  coding: "bg-purple-100 text-purple-800",
-  reasoning: "bg-orange-100 text-orange-800",
-  vision: "bg-green-100 text-green-800",
-  translation: "bg-yellow-100 text-yellow-800",
+  text: "bg-blue-100 text-blue-800 border-blue-200",
+  coding: "bg-purple-100 text-purple-800 border-purple-200",
+  reasoning: "bg-orange-100 text-orange-800 border-orange-200",
+  vision: "bg-green-100 text-green-800 border-green-200",
+  translation: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  audio: "bg-pink-100 text-pink-800 border-pink-200",
 };
 
 export function ModelList({ models, onFavorite, favorites = [] }: ModelListProps) {

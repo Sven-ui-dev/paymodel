@@ -6,10 +6,29 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Code, Brain, Eye, Globe, FileText, Mic } from "lucide-react";
 
 interface PriceCalculatorProps {
   models: CurrentPrice[];
 }
+
+const capabilityIcons: Record<string, React.ReactNode> = {
+  text: <FileText className="w-3 h-3" />,
+  coding: <Code className="w-3 h-3" />,
+  reasoning: <Brain className="w-3 h-3" />,
+  vision: <Eye className="w-3 h-3" />,
+  translation: <Globe className="w-3 h-3" />,
+  audio: <Mic className="w-3 h-3" />,
+};
+
+const capabilityColors: Record<string, string> = {
+  text: "bg-blue-100 text-blue-800 border-blue-200",
+  coding: "bg-purple-100 text-purple-800 border-purple-200",
+  reasoning: "bg-orange-100 text-orange-800 border-orange-200",
+  vision: "bg-green-100 text-green-800 border-green-200",
+  translation: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  audio: "bg-pink-100 text-pink-800 border-pink-200",
+};
 
 export function PriceCalculator({ models }: PriceCalculatorProps) {
   const [inputTokens, setInputTokens] = useState<string>("100000");
@@ -93,8 +112,20 @@ export function PriceCalculator({ models }: PriceCalculatorProps) {
             </p>
             <div className="flex flex-wrap gap-2 mt-2">
               {freeModels.map((model) => (
-                <Badge key={model.model_id} variant="secondary" className="bg-green-100">
-                  {model.model_name}
+                <Badge key={model.model_id} variant="secondary" className="bg-green-100 flex items-center gap-1">
+                  <span>{model.model_name}</span>
+                  {model.capabilities && model.capabilities.length > 0 && (
+                    <div className="flex gap-0.5">
+                      {model.capabilities.slice(0, 2).map((cap) => (
+                        <span
+                          key={cap}
+                          className={`inline-flex items-center px-1 rounded text-[10px] ${capabilityColors[cap] || 'bg-gray-200'}`}
+                        >
+                          {capabilityIcons[cap]}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </Badge>
               ))}
             </div>
@@ -113,15 +144,31 @@ export function PriceCalculator({ models }: PriceCalculatorProps) {
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-primary/10 font-bold text-sm">
+                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-primary/10 font-bold text-sm shrink-0">
                   {index + 1}
                 </div>
-                <div>
-                  <p className="font-medium">{model.model_name}</p>
-                  <p className="text-xs text-muted-foreground">{model.provider_name}</p>
+                <div className="min-w-0">
+                  <p className="font-medium truncate">{model.model_name}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-xs text-muted-foreground">{model.provider_name}</p>
+                    {/* Capabilities */}
+                    {model.capabilities && model.capabilities.length > 0 && (
+                      <div className="flex gap-1">
+                        {model.capabilities.slice(0, 3).map((cap) => (
+                          <span
+                            key={cap}
+                            className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] border ${capabilityColors[cap] || 'bg-gray-100 text-gray-800'}`}
+                            title={cap}
+                          >
+                            {capabilityIcons[cap]}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0 ml-2">
                 <p className="font-bold text-lg">{formatCurrency(model.totalCost)}</p>
                 {index === 0 && model.totalCost > 0 && (
                   <Badge variant="default" className="text-xs">
@@ -144,6 +191,18 @@ export function PriceCalculator({ models }: PriceCalculatorProps) {
               <p className="text-sm mt-1">
                 💡 Empfehlung: <strong>{getCheapest()?.model_name}</strong> für{" "}
                 <strong>{formatCurrency(getCheapest()?.totalCost || 0)}</strong>
+                {getCheapest()?.capabilities && getCheapest()?.capabilities!.length > 0 && (
+                  <span className="ml-2 flex gap-1 inline-flex">
+                    {getCheapest()?.capabilities!.map((cap) => (
+                      <span
+                        key={cap}
+                        className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs border ${capabilityColors[cap] || 'bg-gray-100'}`}
+                      >
+                        {capabilityIcons[cap]}
+                      </span>
+                    ))}
+                  </span>
+                )}
               </p>
             )}
           </div>
