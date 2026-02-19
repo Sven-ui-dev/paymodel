@@ -18,6 +18,17 @@ export default function Home() {
   const [filteredModels, setFilteredModels] = useState<CurrentPrice[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Check if user is logged in
+    import("@/lib/supabase/client").then(({ createClient }) => {
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        setUser(user);
+      });
+    });
+  }, []);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [calculatorInput, setCalculatorInput] = useState(2500000);
@@ -148,6 +159,11 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" asChild>
+                <a href={user ? "/dashboard" : "/login"}>
+                  {user ? "Dashboard" : "Login"}
+                </a>
+              </Button>
               <Button size="sm" asChild>
                 <a href="#waitlist">Early Access</a>
               </Button>
