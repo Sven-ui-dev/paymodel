@@ -49,7 +49,7 @@ const PLANS = [
 ];
 
 export default async function PricingPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   // Get user profile if logged in
