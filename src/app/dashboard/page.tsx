@@ -28,6 +28,7 @@ import {
   Sparkles,
   Clock,
   RefreshCw,
+  LucideProps,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -60,7 +61,15 @@ interface Profile {
 }
 
 // Feature list for each plan
-const planFeatures = {
+type PlanType = 'free' | 'pro' | 'business';
+
+interface PlanFeature {
+  name: string;
+  icon: React.ComponentType<Omit<LucideProps, "ref">>;
+  included?: boolean;
+}
+
+const planFeatures: Record<PlanType, PlanFeature[]> = {
   free: [
     { name: "Preisvergleich", icon: BarChart3 },
     { name: "Kostenrechner", icon: TrendingUp },
@@ -205,7 +214,7 @@ export default function DashboardPage() {
     );
   }
 
-  const planColors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
+  const planColors: Record<PlanType, { bg: string; text: string; border: string; gradient: string }> = {
     free: {
       bg: "bg-muted",
       text: "text-muted-foreground",
@@ -236,7 +245,7 @@ export default function DashboardPage() {
     return email.split("@")[0].slice(0, 2).toUpperCase();
   };
 
-  const currentPlan = profile?.subscription_plan || "free";
+  const currentPlan: PlanType = (profile?.subscription_plan as PlanType) || "free";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
