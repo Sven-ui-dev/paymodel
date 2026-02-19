@@ -495,6 +495,7 @@ export default function Home() {
             <p>© 2026 paymodel.ai – Alle Rechte vorbehalten.</p>
             <div className="flex justify-center gap-4 mt-2">
               <Link href="/impressum" className="hover:underline">Impressum</Link>
+              <Link href="/datenschutz" className="hover:underline">Datenschutz</Link>
               <Link href="/contact" className="hover:underline">Kontakt</Link>
               <a href="mailto:info@paymodel.ai" className="hover:underline">info@paymodel.ai</a>
             </div>

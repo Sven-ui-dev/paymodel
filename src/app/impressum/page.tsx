@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const metadata = {
   title: "Impressum - paymodel.ai",
   description: "Impressum und Kontaktdaten von paymodel.ai",
@@ -18,8 +20,20 @@ export default function ImpressumPage() {
         <div className="space-y-6 text-muted-foreground">
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-2">Angaben gemäß § 5 TMG</h3>
-            <p>paymodel.ai</p>
-            <p>E-Mail: info@paymodel.ai</p>
+            <p className="font-semibold text-foreground">Sven Grewe</p>
+            <p>── ADRESSE EINGEBEN ──</p>
+            <p className="text-red-500 text-sm mt-1">
+              * Bitte hier Ihre ladungsfähige Anschrift eintragen
+            </p>
+            <p className="mt-4">E-Mail: info@paymodel.ai</p>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Verbraucherstreitbeilegung</h3>
+            <p>
+              Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren 
+              vor einer Verbraucherschlichtungsstelle teilzunehmen.
+            </p>
           </div>
 
           <div>
@@ -27,7 +41,9 @@ export default function ImpressumPage() {
             <p>
               Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. 
               Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte 
-              können wir jedoch keine Gewähr übernehmen.
+              können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir 
+              gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den 
+              allgemeinen Gesetzen verantwortlich.
             </p>
           </div>
 
@@ -37,6 +53,7 @@ export default function ImpressumPage() {
               Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren 
               Inhalte wir keinen Einfluss haben. Für die Inhalte der verlinkten 
               Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.
+              Wir distanzieren uns hiermit ausdrücklich von allen Inhalten Dritter.
             </p>
           </div>
 
@@ -51,7 +68,18 @@ export default function ImpressumPage() {
             </p>
           </div>
 
-          <div className="pt-6">
+          <div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Datenschutz</h3>
+            <p>
+              Informationen zum Umgang mit Ihren Daten finden Sie in unserer{" "}
+              <Link href="/datenschutz" className="text-primary hover:underline">
+                Datenschutzerklärung
+              </Link>
+              .
+            </p>
+          </div>
+
+          <div className="pt-6 border-t">
             <p className="text-sm">
               Stand: {new Date().toLocaleDateString("de-DE")}
             </p>
