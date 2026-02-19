@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-01-27.acacia',
@@ -21,11 +22,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
   try {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
 
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -35,9 +49,7 @@ export async function POST(request: Request) {
         const subscriptionId = session.subscription as string;
         const planName = session.metadata?.planName || 'pro';
 
-        // Create or update profile
         if (email) {
-          // Get user from email (simplified - in production, you'd use auth)
           const { data: profiles } = await supabase
             .from('profiles')
             .select('id')
@@ -65,7 +77,6 @@ export async function POST(request: Request) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         
-        // Find profile by Stripe customer ID
         const { data: profiles } = await supabase
           .from('profiles')
           .select('id')
@@ -84,7 +95,6 @@ export async function POST(request: Request) {
             })
             .eq('id', profiles.id);
 
-          // Add to history
           await supabase.from('subscription_history').insert({
             user_id: profiles.id,
             stripe_subscription_id: subscription.id,
