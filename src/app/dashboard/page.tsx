@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 import {
   Loader2,
   CreditCard,
@@ -161,9 +162,12 @@ export default function DashboardPage() {
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        toast.error(data.error || "Fehler beim Öffnen des Stripe Portals");
       }
     } catch (error) {
       console.error("Portal error:", error);
+      toast.error("Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.");
     } finally {
       setManageLoading(false);
     }
@@ -189,9 +193,12 @@ export default function DashboardPage() {
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        toast.error(data.error || "Fehler beim Erstellen des Checkouts");
       }
     } catch (error) {
       console.error("Checkout error:", error);
+      toast.error("Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.");
     } finally {
       setManageLoading(false);
     }

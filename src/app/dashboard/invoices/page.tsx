@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, FileText, ArrowLeft, Download, Calendar, DollarSign, CreditCard } from "lucide-react";
+import { toast } from "sonner";
 import Link from "next/link";
 
 // Helper function to format date
@@ -71,12 +72,14 @@ export default function InvoicesPage() {
 
       if (error) {
         console.error("Error fetching invoices:", error);
+        toast.error("Rechnungen konnten nicht geladen werden");
         setInvoices([]);
       } else {
         setInvoices(data || []);
       }
     } catch (error) {
       console.error("Error fetching invoices:", error);
+      toast.error("Ein unerwarteter Fehler ist aufgetreten");
       setInvoices([]);
     } finally {
       setLoading(false);

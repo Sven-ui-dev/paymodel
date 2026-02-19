@@ -226,18 +226,22 @@ export default function SettingsPage() {
 
     setDeleting(true);
     try {
-      // Delete profile from database first
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("id", user.id);
+      // Get the auth header for the API call
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const response = await fetch("/api/user/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: session?.access_token || "",
+        },
+      });
 
-      if (profileError) throw profileError;
+      const data = await response.json();
 
-      // Delete auth user
-      const { error: authError } = await supabase.auth.admin.deleteUser(user.id);
-
-      if (authError) throw authError;
+      if (!response.ok) {
+        throw new Error(data.error || "Account konnte nicht gelöscht werden");
+      }
 
       toast.success("Ihr Account wurde erfolgreich gelöscht");
       
@@ -247,7 +251,7 @@ export default function SettingsPage() {
       }, 2000);
     } catch (error: any) {
       console.error("Delete account error:", error);
-      toast.error("Account konnte nicht gelöscht werden: " + error.message);
+      toast.error(error.message || "Account konnte nicht gelöscht werden");
     } finally {
       setDeleting(false);
     }

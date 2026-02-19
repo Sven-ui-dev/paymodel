@@ -68,49 +68,119 @@ export default function StatsPage() {
   };
 
   const fetchStats = async () => {
-    // Simulated data for demo - in production, fetch from Supabase
-    // Based on time range, adjust the data
-    
-    const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
-    
-    // Generate daily query data
-    const dailyQueries = [];
-    const savingsData = [];
-    const today = new Date();
-    
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split("T")[0];
-      
-      dailyQueries.push({
-        date: dateStr,
-        count: Math.floor(Math.random() * 20) + 1,
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Fetch saved models count
+      const { count: savedModels } = await supabase
+        .from("saved_models")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+
+      // Fetch search queries count
+      const { count: totalQueries } = await supabase
+        .from("search_queries")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+
+      // Fetch most used models
+      const { data: mostUsedModelsData } = await supabase
+        .from("search_queries")
+        .select("model_name, model_provider, count")
+        .eq("user_id", user.id)
+        .gte("created_at", getTimeRangeDate(timeRange))
+        .order("created_at", { ascending: false });
+
+      // Aggregate most used models
+      const modelCounts: Record<string, { count: number; provider: string }> = {};
+      mostUsedModelsData?.forEach((item) => {
+        if (item.model_name) {
+          if (!modelCounts[item.model_name]) {
+            modelCounts[item.model_name] = { count: 0, provider: item.model_provider || "Unknown" };
+          }
+          modelCounts[item.model_name].count += 1;
+        }
       });
-      
-      savingsData.push({
-        date: dateStr,
-        amount: Math.floor(Math.random() * 50) + 5,
+
+      const mostUsedModels = Object.entries(modelCounts)
+        .map(([name, data]) => ({
+          name,
+          ...data,
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+      // Fetch daily queries for chart
+      const { data: dailyQueriesData } = await supabase
+        .from("search_queries")
+        .select("created_at")
+        .eq("user_id", user.id)
+        .gte("created_at", getTimeRangeDate(timeRange));
+
+      // Process daily queries
+      const dailyQueriesMap: Record<string, number> = {};
+      dailyQueriesData?.forEach((item) => {
+        const date = new Date(item.created_at).toISOString().split("T")[0];
+        dailyQueriesMap[date] = (dailyQueriesMap[date] || 0) + 1;
+      });
+
+      const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
+      const dailyQueries = [];
+      const savingsData = [];
+      const today = new Date();
+
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split("T")[0];
+        
+        dailyQueries.push({
+          date: dateStr,
+          count: dailyQueriesMap[dateStr] || 0,
+        });
+
+        // Calculate estimated savings (mock calculation based on queries)
+        const queryCount = dailyQueriesMap[dateStr] || 0;
+        const estimatedSavings = queryCount * 2.5; // €2.50 average savings per query
+        savingsData.push({
+          date: dateStr,
+          amount: Math.round(estimatedSavings * 100) / 100,
+        });
+      }
+
+      // Calculate total savings
+      const totalSavings = savingsData.reduce((sum, item) => sum + item.amount, 0);
+
+      setStats({
+        savedModels: savedModels || 0,
+        totalQueries: totalQueries || 0,
+        mostUsedModels,
+        dailyQueries,
+        savingsData,
+        totalSavings: Math.round(totalSavings * 100) / 100,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      // Fallback to empty stats on error
+      setStats({
+        savedModels: 0,
+        totalQueries: 0,
+        mostUsedModels: [],
+        dailyQueries: [],
+        savingsData: [],
+        totalSavings: 0,
       });
     }
+  };
 
-    // Mock data based on time range
-    const multiplier = timeRange === "7d" ? 1 : timeRange === "30d" ? 4 : 12;
-    
-    setStats({
-      savedModels: 12 * multiplier,
-      totalQueries: Math.floor(Math.random() * 200) * multiplier,
-      mostUsedModels: [
-        { name: "GPT-4o", count: Math.floor(Math.random() * 50) * multiplier, provider: "OpenAI" },
-        { name: "Claude 3.5 Sonnet", count: Math.floor(Math.random() * 40) * multiplier, provider: "Anthropic" },
-        { name: "Gemini 1.5 Pro", count: Math.floor(Math.random() * 30) * multiplier, provider: "Google" },
-        { name: "GPT-4o-mini", count: Math.floor(Math.random() * 25) * multiplier, provider: "OpenAI" },
-        { name: "Llama 3.1 405B", count: Math.floor(Math.random() * 15) * multiplier, provider: "Meta" },
-      ],
-      dailyQueries,
-      savingsData,
-      totalSavings: Math.floor(Math.random() * 500) * multiplier + 150,
-    });
+  // Helper function to get date for time range
+  const getTimeRangeDate = (range: TimeRange): string => {
+    const days = range === "7d" ? 7 : range === "30d" ? 30 : 90;
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    return date.toISOString();
   };
 
   if (loading) {
