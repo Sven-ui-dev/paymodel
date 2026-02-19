@@ -1,5 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
-import { useState } from 'react';
+"use client";
+
+import { createClient } from '@/lib/supabase/client';
+import { useState, useEffect } from 'react';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
 
@@ -49,20 +51,22 @@ const PLANS = [
   },
 ];
 
-export default async function PricingPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export default function PricingPage() {
+  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Get user profile if logged in
-  let profile = null;
-  if (user) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-    profile = data;
-  }
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      if (user) {
+        supabase.from('profiles').select('*').eq('id', user.id).single()
+          .then(({ data }) => setProfile(data));
+      }
+      setLoading(false);
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
