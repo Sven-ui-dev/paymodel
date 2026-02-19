@@ -6,7 +6,29 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, CreditCard, LogOut, Crown, Calendar, CheckCircle, AlertCircle } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import {
+  Loader2,
+  CreditCard,
+  LogOut,
+  Crown,
+  Calendar,
+  CheckCircle,
+  AlertCircle,
+  TrendingUp,
+  Zap,
+  Shield,
+  BarChart3,
+  ChevronRight,
+  Settings,
+  Bell,
+  FileText,
+  User,
+  Sparkles,
+  Clock,
+  RefreshCw,
+} from "lucide-react";
 import Link from "next/link";
 
 // Helper function to format date
@@ -19,6 +41,14 @@ const formatDate = (dateString?: string) => {
   });
 };
 
+// Format currency
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+  }).format(amount);
+};
+
 interface Profile {
   id: string;
   email: string;
@@ -26,14 +56,38 @@ interface Profile {
   subscription_status: string;
   stripe_customer_id?: string;
   current_period_end?: string;
+  created_at?: string;
 }
+
+// Feature list for each plan
+const planFeatures = {
+  free: [
+    { name: "Preisvergleich", icon: BarChart3 },
+    { name: "Kostenrechner", icon: TrendingUp },
+    { name: "5 Modell-Vergleiche/Tag", icon: Zap, included: false },
+  ],
+  pro: [
+    { name: "Alles aus Free", icon: CheckCircle, included: true },
+    { name: "Unbegrenzter Preisvergleich", icon: Zap },
+    { name: "Echtzeit-Preise", icon: Clock },
+    { name: "Preis-Benachrichtigungen", icon: Bell },
+    { name: "Export-Funktionen", icon: Settings },
+  ],
+  business: [
+    { name: "Alles aus Pro", icon: CheckCircle, included: true },
+    { name: "API-Zugang", icon: Zap },
+    { name: "Team-Funktionen", icon: User },
+    { name: "Prioritäts-Support", icon: Shield },
+    { name: "Custom Integrations", icon: Settings },
+  ],
+};
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [manageLoading, setManageLoading] = useState(false);
-  
+
   const router = useRouter();
   const supabase = createClient();
 
@@ -86,7 +140,7 @@ export default function DashboardPage() {
       router.push("/pricing");
       return;
     }
-    
+
     setManageLoading(true);
     try {
       const res = await fetch("/api/stripe/portal", {
@@ -135,189 +189,407 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full border-4 border-muted animate-spin">
+              <div className="w-full h-full rounded-full border-4 border-primary border-t-transparent" />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+            </div>
+          </div>
+          <p className="text-muted-foreground animate-pulse">Dashboard wird geladen...</p>
+        </div>
       </div>
     );
   }
 
-  const planColors: Record<string, string> = {
-    free: "bg-gray-500",
-    pro: "bg-blue-500",
-    business: "bg-purple-500",
+  const planColors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
+    free: {
+      bg: "bg-muted",
+      text: "text-muted-foreground",
+      border: "border-muted-foreground/20",
+      gradient: "from-gray-500 to-gray-600",
+    },
+    pro: {
+      bg: "bg-blue-500/10",
+      text: "text-blue-600",
+      border: "border-blue-500/20",
+      gradient: "from-blue-500 to-blue-600",
+    },
+    business: {
+      bg: "bg-purple-500/10",
+      text: "text-purple-600",
+      border: "border-purple-500/20",
+      gradient: "from-purple-500 to-purple-600",
+    },
   };
 
-  // Plan prices map
   const planPrices: Record<string, string> = {
-    free: "€0/Monat",
-    pro: "€19/Monat",
-    business: "€29/Monat",
+    free: "0",
+    pro: "19",
+    business: "29",
   };
+
+  const getInitials = (email: string) => {
+    return email.split("@")[0].slice(0, 2).toUpperCase();
+  };
+
+  const currentPlan = profile?.subscription_plan || "free";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header */}
-      <header className="border-b sticky top-0 bg-background/95 backdrop-blur z-10">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <Link href="/" className="font-bold text-xl">
-              paymodel.ai
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center transition-transform group-hover:scale-105">
+                <Sparkles className="w-4 h-4 text-primary-foreground" />
+              </div>
+              <span className="font-bold text-lg tracking-tight">paymodel.ai</span>
             </Link>
-            <div className="flex items-center gap-4">
-              <Link href="/pricing" className="text-sm font-medium">
-                Preise
+
+            <div className="flex items-center gap-2">
+              <Link href="/pricing">
+                <Button variant="ghost" size="sm" className="hidden sm:flex">
+                  Preise
+                </Button>
               </Link>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <Separator orientation="vertical" className="h-6 hidden sm:block" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <LogOut className="w-4 h-4 mr-2" />
-                Logout
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+      <main className="container mx-auto px-4 py-8 max-w-5xl">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight mb-1">
+                Willkommen zurück 👋
+              </h1>
+              <p className="text-muted-foreground">
+                Hier ist dein aktueller Abo-Status und deine Übersicht
+              </p>
+            </div>
+            <Avatar className="w-12 h-12 bg-primary/10 ring-2 ring-primary/20">
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                {profile?.email ? getInitials(profile.email) : "U"}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
 
-        {/* Profile Card - Subscription Status */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Crown className="w-5 h-5" />
-              Subscription
-            </CardTitle>
-            <CardDescription>
-              Dein aktueller Abo-Status und Plan-Details
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Plan & Status Row */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-muted/50 rounded-lg">
-              <div className="flex items-center gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Aktueller Plan</p>
-                  <div className="flex items-center gap-2">
-                    <Badge className={planColors[profile?.subscription_plan || "free"]}>
-                      {profile?.subscription_plan === "pro" && <Crown className="w-3 h-3 mr-1" />}
-                      {(profile?.subscription_plan || "free").toUpperCase()}
-                    </Badge>
-                    <span className="text-lg font-semibold">{planPrices[profile?.subscription_plan || "free"]}</span>
+        {/* Subscription Overview Cards */}
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
+          {/* Main Plan Card */}
+          <Card className={`md:col-span-2 border-2 ${planColors[currentPlan].border} overflow-hidden`}>
+            <div className={`h-1 bg-gradient-to-r ${planColors[currentPlan].gradient}`} />
+            <CardContent className="pt-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 rounded-xl ${planColors[currentPlan].bg} flex items-center justify-center`}>
+                    <Crown className={`w-6 h-6 ${planColors[currentPlan].text}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Aktueller Plan</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge
+                        className={`${
+                          currentPlan === "free"
+                            ? "bg-muted text-muted-foreground"
+                            : currentPlan === "pro"
+                            ? "bg-blue-500 text-white"
+                            : "bg-purple-500 text-white"
+                        }`}
+                      >
+                        {currentPlan === "pro" && <Crown className="w-3 h-3 mr-1" />}
+                        {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
+                      </Badge>
+                      {currentPlan !== "free" && (
+                        <span className="text-lg font-semibold">
+                          €{planPrices[currentPlan]}/Monat
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {profile?.subscription_status === "active" ? (
+                        <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Aktiv
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">
+                          <AlertCircle className="w-3 h-3 mr-1" />
+                          Inaktiv
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="flex gap-6 px-4 py-3 bg-muted/50 rounded-lg">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold">{modelsAfforded(currentPlan)}</p>
+                    <p className="text-xs text-muted-foreground">Modelle verfügbar</p>
+                  </div>
+                  <Separator orientation="vertical" className="h-10" />
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-green-600">
+                      {currentPlan === "free" ? "0%" : currentPlan === "pro" ? "40%" : "60%"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Einsparpotenzial</p>
                   </div>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <Badge variant={profile?.subscription_status === "active" ? "default" : "secondary"}>
-                    {profile?.subscription_status === "active" ? (
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                    ) : (
-                      <AlertCircle className="w-3 h-3 mr-1" />
-                    )}
-                    {profile?.subscription_status === "active" ? "Aktiv" : "Inaktiv"}
-                  </Badge>
-                </div>
-              </div>
-            </div>
 
-            {/* Renewal Date */}
-            {(profile?.subscription_plan === "pro" || profile?.subscription_plan === "business") && (
-              <div className="flex items-center gap-3 p-4 border rounded-lg">
-                <Calendar className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Nächste Abrechnung</p>
-                  <p className="font-medium">{formatDate(profile?.current_period_end)}</p>
+              {/* Renewal Date */}
+              {(currentPlan === "pro" || currentPlan === "business") && profile?.current_period_end && (
+                <div className="mt-6 flex items-center gap-3 p-4 bg-muted/50 rounded-lg border border-dashed">
+                  <Calendar className="w-5 h-5 text-muted-foreground shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground">Nächste Abrechnung</p>
+                    <p className="font-medium">{formatDate(profile.current_period_end)}</p>
+                  </div>
+                  <RefreshCw className="w-4 h-4 text-muted-foreground" />
                 </div>
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              {profile?.subscription_status === "active" ? (
-                <Button onClick={handleManageSubscription} disabled={manageLoading}>
-                  {manageLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <CreditCard className="w-4 h-4 mr-2" />}
-                  Subscription verwalten
-                </Button>
-              ) : (
-                <Link href="/pricing">
-                  <Button>Jetzt upgraden</Button>
-                </Link>
               )}
-              
-              <Link href="/pricing">
-                <Button variant="outline">
-                  Alle Pläne ansehen
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Preise vergleichen</CardTitle>
-              <CardDescription>
-                Alle AI-Modelle im Überblick
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href="/">
-                <Button variant="outline" className="w-full">
-                  Preisvergleich öffnen
-                </Button>
-              </Link>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Kostenrechner</CardTitle>
-              <CardDescription>
-                Berechne deine monatlichen Kosten
-              </CardDescription>
+          {/* Quick Actions Card */}
+          <Card className="border-dashed">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Zap className="w-4 h-4 text-amber-500" />
+                Schnellaktionen
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <Link href="/#kostenrechner">
-                <Button variant="outline" className="w-full">
-                  Rechner öffnen
+            <CardContent className="space-y-2">
+              {profile?.subscription_status === "active" ? (
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={handleManageSubscription}
+                  disabled={manageLoading}
+                >
+                  {manageLoading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <CreditCard className="w-4 h-4 mr-2" />
+                  )}
+                  Subscription verwalten
+                </Button>
+              ) : (
+                <Button className="w-full" onClick={() => router.push("/pricing")}>
+                  <Crown className="w-4 h-4 mr-2" />
+                  Jetzt upgraden
+                </Button>
+              )}
+
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => router.push("/#kostenrechner")}
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Kostenrechner
+              </Button>
+
+              <Link href="/pricing" className="block">
+                <Button variant="ghost" className="w-full justify-between">
+                  Alle Pläne ansehen
+                  <ChevronRight className="w-4 h-4" />
                 </Button>
               </Link>
             </CardContent>
           </Card>
         </div>
 
+        {/* Features Comparison */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-primary" />
+              Deine Plan-Features
+            </CardTitle>
+            <CardDescription>
+              Übersicht der in deinem Plan enthaltenen Funktionen
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {planFeatures[currentPlan].map((feature, index) => (
+                <div
+                  key={feature.name}
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 hover:scale-[1.02] ${
+                    feature.included
+                      ? "bg-primary/5"
+                      : "bg-muted/50"
+                  }`}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                      feature.included
+                        ? "bg-green-500/10 text-green-600"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {feature.included ? (
+                      <CheckCircle className="w-4 h-4" />
+                    ) : (
+                      <feature.icon className="w-4 h-4" />
+                    )}
+                  </div>
+                  <span className={feature.included ? "font-medium" : "text-muted-foreground"}>
+                    {feature.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Upgrade CTA for Free Users */}
-        {profile?.subscription_plan === "free" && (
-          <Card className="mt-8 bg-primary/5">
-            <CardHeader>
-              <CardTitle>Upgrade zu Pro</CardTitle>
-              <CardDescription>
-                Erhalte erweiterte Features und Support
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <Button 
-                  onClick={() => handleUpgrade("price_1T2UBVAwdEweUSNveqIRiSE2", "pro")}
-                  disabled={manageLoading}
-                >
-                  Pro für €19/Monat
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => handleUpgrade("price_1T2UFEAwdEweUSNvkKOoPJSQ", "business")}
-                  disabled={manageLoading}
-                >
-                  Business für €29/Monat
-                </Button>
+        {currentPlan === "free" && (
+          <Card className="mb-8 bg-gradient-to-r from-primary/10 via-primary/5 to-background border-primary/20">
+            <CardContent className="pt-6">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 animate-pulse">
+                    <Crown className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-1">Upgrade zu Pro</h3>
+                    <p className="text-muted-foreground mb-3">
+                      Erhalte erweiterte Features, Echtzeit-Preise und Premium-Support
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <Badge variant="outline" className="bg-background">
+                        ✓ Echtzeit-Preise
+                      </Badge>
+                      <Badge variant="outline" className="bg-background">
+                        ✓ Preis-Benachrichtigungen
+                      </Badge>
+                      <Badge variant="outline" className="bg-background">
+                        ✓ Export-Funktionen
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                  <Button
+                    size="lg"
+                    className="flex-1 sm:flex-none bg-blue-500 hover:bg-blue-600"
+                    onClick={() => handleUpgrade("price_1T2UBVAwdEweUSNveqIRiSE2", "pro")}
+                    disabled={manageLoading}
+                  >
+                    {manageLoading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Crown className="w-4 h-4 mr-2" />
+                    )}
+                    Pro für €19/Monat
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="flex-1 sm:flex-none"
+                    onClick={() => handleUpgrade("price_1T2UFEAwdEweUSNvkKOoPJSQ", "business")}
+                    disabled={manageLoading}
+                  >
+                    Business für €29/Monat
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
         )}
+
+        {/* Info Cards Grid */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <Card className="group hover:border-primary/30 transition-colors cursor-pointer" onClick={() => router.push("/")}>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                  <BarChart3 className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold mb-1">Preise vergleichen</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Alle AI-Modelle im direkten Vergleich
+                  </p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="group hover:border-primary/30 transition-colors cursor-pointer" onClick={() => router.push("/#kostenrechner")}>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                  <TrendingUp className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold mb-1">Kostenrechner</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Berechne deine monatlichen Kosten
+                  </p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t mt-12 py-6">
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+          <p>© 2026 paymodel.ai – Alle Rechte vorbehalten.</p>
+          <div className="flex justify-center gap-4 mt-2">
+            <Link href="/impressum" className="hover:text-foreground transition-colors">
+              Impressum
+            </Link>
+            <Link href="/datenschutz" className="hover:text-foreground transition-colors">
+              Datenschutz
+            </Link>
+            <Link href="/contact" className="hover:text-foreground transition-colors">
+              Kontakt
+            </Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
+}
+
+// Helper function for demo purposes
+function modelsAfforded(plan: string): string {
+  switch (plan) {
+    case "free":
+      return "∞";
+    case "pro":
+      return "∞";
+    case "business":
+      return "∞";
+    default:
+      return "∞";
+  }
 }
