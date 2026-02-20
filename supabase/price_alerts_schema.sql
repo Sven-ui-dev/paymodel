@@ -2,10 +2,11 @@
 -- PRICE ALERTS: Preis-Warnungen für Modelle
 -- ============================================================================
 
+-- Table erstellen
 CREATE TABLE price_alerts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    model_id UUID REFERENCES models(id) ON DELETE CASCADE NOT NULL,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    model_id INTEGER REFERENCES models(id) ON DELETE CASCADE NOT NULL,
     target_price DECIMAL(10, 4) NOT NULL,
     current_price DECIMAL(10, 4),
     is_active BOOLEAN DEFAULT true,
@@ -14,6 +15,7 @@ CREATE TABLE price_alerts (
     triggered_at TIMESTAMP WITH TIME ZONE
 );
 
+-- Indexes erstellen
 CREATE INDEX idx_price_alerts_user ON price_alerts(user_id);
 CREATE INDEX idx_price_alerts_model ON price_alerts(model_id);
 CREATE INDEX idx_price_alerts_active ON price_alerts(is_active) WHERE is_active = true;
@@ -42,3 +44,22 @@ FROM price_alerts pa
 JOIN models m ON pa.model_id = m.id
 JOIN providers p ON m.provider_id = p.id
 WHERE pa.is_active = true;
+
+-- RLS Policy für Benutzerzugriff
+ALTER TABLE price_alerts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own alerts" ON price_alerts
+    FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can create own alerts" ON price_alerts
+    FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own alerts" ON price_alerts
+    FOR DELETE
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own alerts" ON price_alerts
+    FOR UPDATE
+    USING (auth.uid() = user_id);
