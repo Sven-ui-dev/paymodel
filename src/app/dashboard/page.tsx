@@ -333,7 +333,7 @@ export default function DashboardPage() {
                     <p className="text-xl sm:text-2xl font-bold">{modelsAfforded(currentPlan)}</p>
                     <p className="text-xs text-muted-foreground">Modelle</p>
                   </div>
-                  <Separator orientation="vertical" className="h-10 hidden sm:block" />
+                  <div className="w-px bg-border hidden sm:block" />
                   <div className="text-center">
                     <p className="text-xl sm:text-2xl font-bold text-green-600">
                       {currentPlan === "free" ? "0%" : currentPlan === "pro" ? "40%" : "60%"}
