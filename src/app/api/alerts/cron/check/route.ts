@@ -53,6 +53,11 @@ export async function POST() {
     let emailErrors = 0;
 
     for (const alert of alerts) {
+      // @ts-ignore - Supabase nested select returns arrays
+      const model = alert.models[0];
+      // @ts-ignore
+      const user = alert.users[0];
+
       try {
         // Aktuellen Preis aus der prices Tabelle holen
         const { data: latestPrice, error: priceError } = await supabase
@@ -73,26 +78,26 @@ export async function POST() {
 
         // Prüfen ob Zielpreis erreicht
         if (currentPrice <= alert.target_price) {
-          console.log(`🎯 [Price Alerts Cron] Alert ausgelöst für Modell ${alert.models.name}`);
+          console.log(`🎯 [Price Alerts Cron] Alert ausgelöst für Modell ${model.name}`);
 
           // Email senden
           const { error: emailError } = await resend.emails.send({
             from: 'paymodel.ai <waitlist@paymodel.ai>',
-            to: [alert.users.email],
-            subject: `Preis-Alert: ${alert.models.name} ist unter deinem Zielpreis!`,
+            to: [user.email],
+            subject: `Preis-Alert: ${model.name} ist unter deinem Zielpreis!`,
             html: generatePriceAlertEmailContent({
-              modelName: alert.models.name,
-              providerName: alert.models.providers.name,
+              modelName: model.name,
+              providerName: model.providers?.[0]?.name || 'Unknown',
               targetPrice: Number(alert.target_price),
               currentPrice,
-              modelSlug: alert.models.slug,
+              modelSlug: model.slug,
             }).html,
             text: generatePriceAlertEmailContent({
-              modelName: alert.models.name,
-              providerName: alert.models.providers.name,
+              modelName: model.name,
+              providerName: model.providers?.[0]?.name || 'Unknown',
               targetPrice: Number(alert.target_price),
               currentPrice,
-              modelSlug: alert.models.slug,
+              modelSlug: model.slug,
             }).text,
           });
 
