@@ -153,7 +153,7 @@ export default function Home() {
               Alle Modelle. Alle Preise. Ein Blick.
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Aktuelle Token-Preise, Geschwindigkeit und Qualität der wichtigsten AI-Modelle im direkten Vergleich.
+              Aktuelle Token-Preise, Geschwindigkeit und Qualität der wichtigsten AI-Modelle im direkten Vergleich. 100% neutral und unabhängig von Anbietern. Keine Verwendung von Affiliate-Links.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <Button asChild size="lg">
