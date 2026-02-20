@@ -10,7 +10,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Navbar } from "@/components/ui-extended/Navbar";
 import { PriceAlertsList } from "@/components/PriceAlertsList";
-import {
+import { BenchmarkTool } from "@/components/BenchmarkTool";
+import { getModels, CurrentPrice } from "@/lib/supabase";
   Loader2,
   CreditCard,
   LogOut,
@@ -96,6 +97,7 @@ const planFeatures: Record<PlanType, PlanFeature[]> = {
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [models, setModels] = useState<CurrentPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [manageLoading, setManageLoading] = useState(false);
 
@@ -138,6 +140,11 @@ export default function DashboardPage() {
         subscription_status: "inactive",
       });
     }
+    
+    // Load models for benchmark
+    const { data: modelsData } = await getModels();
+    setModels(modelsData || []);
+    
     setLoading(false);
   };
 
@@ -508,6 +515,12 @@ export default function DashboardPage() {
 
         {/* Price Alerts Section */}
         {user && <PriceAlertsList userId={user.id} />}
+
+        {/* Benchmark Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">Prompt-Benchmark</h2>
+          <BenchmarkTool models={models} />
+        </div>
 
         {/* Info Cards Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
