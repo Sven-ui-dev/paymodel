@@ -32,6 +32,7 @@ import {
   Sparkles,
   Clock,
   RefreshCw,
+  DollarSign,
   LucideProps,
   PieChart,
 } from "lucide-react";
