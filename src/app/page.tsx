@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Toaster, toast } from "sonner";
 import { ModelList } from "@/components/ModelList";
 import { PriceCalculator } from "@/components/PriceCalculator";
+import { BenchmarkTool } from "@/components/BenchmarkTool";
 import { SearchFilter } from "@/components/SearchFilter";
 import { getModels, getProviders, CurrentPrice, Provider } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -301,6 +302,14 @@ export default function Home() {
                 })}
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Benchmark Section */}
+        <section id="benchmark" className="py-12 px-4 bg-muted/30">
+          <div className="container mx-auto max-w-2xl">
+            <h3 className="text-2xl font-bold mb-6 text-center">Teste deine Prompts</h3>
+            <BenchmarkTool models={models} />
           </div>
         </section>
 
