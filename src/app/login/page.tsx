@@ -77,76 +77,75 @@ export default function AuthPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-          {/* Email Auth Form */}
-          <form onSubmit={handleEmailAuth} className="space-y-4">
-            <div>
-              <Input
-                type="email"
-                placeholder="E-Mail-Adresse"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Input
-                type="password"
-                placeholder="Passwort"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
-            </div>
-            
-            {error && (
-              <p className="text-sm text-red-500">{error}</p>
-            )}
-            {message && (
-              <p className="text-sm text-green-500">{message}</p>
-            )}
-            
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "..." : isLogin ? "Anmelden" : "Registrieren"}
-            </Button>
-          </form>
+            <form onSubmit={handleEmailAuth} className="space-y-4">
+              <div>
+                <Input
+                  type="email"
+                  placeholder="E-Mail-Adresse"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Input
+                  type="password"
+                  placeholder="Passwort"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              </div>
+              
+              {error && (
+                <p className="text-sm text-red-500">{error}</p>
+              )}
+              {message && (
+                <p className="text-sm text-green-500">{message}</p>
+              )}
+              
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "..." : isLogin ? "Anmelden" : "Registrieren"}
+              </Button>
+            </form>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Oder
+                </span>
+              </div>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Oder
-              </span>
-            </div>
-          </div>
 
-          {/* Google Login */}
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={handleGoogleLogin}
-          >
-            Mit Google anmelden
-          </Button>
-
-          <p className="text-center text-sm text-muted-foreground">
-            {isLogin ? "Noch kein Konto?" : "Bereits registriert?"}{" "}
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError("");
-                setMessage("");
-              }}
-              className="text-primary hover:underline"
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={handleGoogleLogin}
             >
-              {isLogin ? "Registrieren" : "Anmelden"}
-            </button>
-          </p>
-        </CardContent>
-      </Card>
+              Mit Google anmelden
+            </Button>
+
+            <p className="text-center text-sm text-muted-foreground">
+              {isLogin ? "Noch kein Konto?" : "Bereits registriert?"}{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError("");
+                  setMessage("");
+                }}
+                className="text-primary hover:underline"
+              >
+                {isLogin ? "Registrieren" : "Anmelden"}
+              </button>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
