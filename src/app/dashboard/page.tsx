@@ -12,6 +12,7 @@ import { Navbar } from "@/components/ui-extended/Navbar";
 import { PriceAlertsList } from "@/components/PriceAlertsList";
 import { BenchmarkTool } from "@/components/BenchmarkTool";
 import { getModels, CurrentPrice } from "@/lib/supabase";
+import { 
   Loader2,
   CreditCard,
   LogOut,
