@@ -155,7 +155,7 @@ export default function Home() {
         {/* Features Section */}
         <section id="features" className="py-12 px-4">
           <div className="container mx-auto">
-            <h2 className="text-2xl font-bold mb-8 text-center">Alle Modelle! Alle Preise! Alles Klar!</h2>
+            <h2 className="text-2xl font-bold mb-8 text-center">Alle Modelle. Alle Preise. Ein Blick.</h2>
             
             {/* Feature Cards - Bento Grid */}
             <div className="grid md:grid-cols-3 gap-6">
