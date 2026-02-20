@@ -49,8 +49,10 @@ export default function Home() {
           getModels(),
           getProviders(),
         ]);
-        setModels(modelsData);
-        setFilteredModels(modelsData);
+        // Sort by sort_order client-side (Supabase order not always reliable)
+        const sortedModels = (modelsData || []).sort((a, b) => (a.sort_order || 999) - (b.sort_order || 999));
+        setModels(sortedModels);
+        setFilteredModels(sortedModels);
         setProviders(providersData);
       } catch (error: any) {
         console.error("Error loading data:", error?.message);
