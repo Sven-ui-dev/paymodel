@@ -143,7 +143,7 @@ export default function DashboardPage() {
     }
     
     // Load models for benchmark
-    const { data: modelsData } = await getModels();
+    const modelsData = await getModels();
     setModels(modelsData || []);
     
     setLoading(false);
