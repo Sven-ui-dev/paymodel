@@ -6,9 +6,12 @@ import { ModelList } from "@/components/ModelList";
 import { PriceCalculator } from "@/components/PriceCalculator";
 import { SearchFilter } from "@/components/SearchFilter";
 import { getModels, getProviders, CurrentPrice, Provider } from "@/lib/supabase";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Navbar } from "@/components/ui-extended/Navbar";
+import { StatsBar } from "@/components/ui-extended/StatsBar";
+import { ModelTable } from "@/components/ui-extended/ModelTable";
 import { Bell, BarChart3, Github, Menu, ExternalLink, Zap, Target, DollarSign, Shield, TrendingUp, Eye } from "lucide-react";
 import Link from "next/link";
 
@@ -137,55 +140,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b sticky top-0 bg-background/95 backdrop-blur z-10">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <h1 className="text-xl font-bold">
-                <img src="/logo.svg" alt="paymodel.ai" className="h-7" />
-              </h1>
-              
-              <nav className="hidden md:flex items-center gap-6">
-                <a href="#preisvergleich" className="text-sm font-medium hover:text-primary transition">
-                  Preisvergleich
-                </a>
-                <a href="#kostenrechner" className="text-sm font-medium hover:text-primary transition">
-                  Kostenrechner
-                </a>
-                <a href="#features" className="text-sm font-medium hover:text-primary transition">
-                  Features
-                </a>
-              </nav>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" asChild>
-                <a href={user ? "/dashboard" : "/login"}>
-                  {user ? "Dashboard" : "Login"}
-                </a>
-              </Button>
-              <Button size="sm" asChild>
-                <a href="#waitlist">Early Access</a>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navbar user={user} />
 
       {/* Stats Bar */}
-      <div className="bg-primary/5 border-b py-2">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-8 text-sm">
-            <span className="font-semibold">{modelCount} AI-MODELLE</span>
-            <span className="text-muted-foreground">|</span>
-            <span className="font-semibold">{providerCount} ANBIETER</span>
-            <span className="text-muted-foreground">|</span>
-            <span className="font-semibold">24h PREIS-UPDATES</span>
-            <span className="text-muted-foreground">|</span>
-            <span className="font-semibold text-green-600">60% Ø EINSPARPOTENZIAL</span>
-          </div>
-        </div>
-      </div>
+      <StatsBar modelCount={modelCount} providerCount={providerCount} />
 
       <main>
         {/* Hero Section */}
@@ -231,62 +189,15 @@ export default function Home() {
             {loading ? (
               <div className="animate-pulse space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="h-16 bg-muted rounded-lg" />
+                  <div key={i} className="h-24 bg-muted rounded-lg" />
                 ))}
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-3 font-medium">Modell</th>
-                      <th className="text-left p-3 font-medium">Provider</th>
-                      <th className="text-right p-3 font-medium">Input / 1M</th>
-                      <th className="text-right p-3 font-medium">Output / 1M</th>
-                      <th className="text-right p-3 font-medium">Kontext</th>
-                      <th className="text-left p-3 font-medium">Capabilities</th>
-                      <th className="text-right p-3 font-medium">Aktion</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredModels.slice(0, 50).map((model) => (
-                      <tr key={model.model_id} className="border-b hover:bg-muted/50">
-                        <td className="p-3 font-medium">{model.model_name}</td>
-                        <td className="p-3">
-                          <Badge variant="outline">{model.provider_name}</Badge>
-                        </td>
-                        <td className="p-3 text-right">
-                          €{model.input_price_per_million.toFixed(2)}
-                        </td>
-                        <td className="p-3 text-right">
-                          €{model.output_price_per_million.toFixed(2)}
-                        </td>
-                        <td className="p-3 text-right">
-                          {model.context_window >= 1000000 
-                            ? `${(model.context_window / 1000000).toFixed(0)}M`
-                            : `${(model.context_window / 1000).toFixed(0)}K`}
-                        </td>
-                        <td className="p-3">
-                          <div className="flex gap-1 flex-wrap">
-                            {model.capabilities?.slice(0, 3).map((cap: string) => (
-                              <Badge key={cap} variant="secondary" className="text-xs">
-                                {cap}
-                              </Badge>
-                            ))}
-                          </div>
-                        </td>
-                        <td className="p-3 text-right">
-                          <Button variant="ghost" size="sm" asChild>
-                            <a href={model.affiliate_url} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ModelTable
+                models={filteredModels}
+                favorites={favorites}
+                onFavorite={handleFavorite}
+              />
             )}
           </div>
         </section>
