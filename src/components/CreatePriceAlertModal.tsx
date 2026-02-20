@@ -42,13 +42,22 @@ export function CreatePriceAlertModal({
     setIsLoading(true);
 
     try {
+      // Get session token
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error("Nicht eingeloggt");
+      }
+
       const response = await fetch("/api/alerts/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          user_id: userId,
           model_id: model.model_id,
           target_price: parseFloat(targetPrice),
           current_price: currentAvgPrice,
