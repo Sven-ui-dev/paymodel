@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Navbar } from "@/components/ui-extended/Navbar";
 import { PriceAlertsList } from "@/components/PriceAlertsList";
 import { BenchmarkTool } from "@/components/BenchmarkTool";
+import { ApiKeysManager } from "@/components/ApiKeysManager";
 import { getModels, CurrentPrice } from "@/lib/supabase";
 import { 
   Loader2,
@@ -411,6 +412,15 @@ export default function DashboardPage() {
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </Link>
+
+              <Button
+                variant="outline"
+                className="w-full justify-start text-xs sm:text-sm text-red-500 hover:text-red-600 hover:bg-red-50"
+                onClick={handleLogout}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Abmelden
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -522,6 +532,14 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold mb-4">Prompt-Benchmark</h2>
           <BenchmarkTool models={models} />
         </div>
+
+        {/* API Keys Section - Business only */}
+        {profile?.subscription_plan === "business" && user && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">API-Zugang</h2>
+            <ApiKeysManager userId={user.id} />
+          </div>
+        )}
 
         {/* Info Cards Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
