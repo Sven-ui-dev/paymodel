@@ -5,7 +5,13 @@ import crypto from 'crypto';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Create client without auto-refresh
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+});
 
 export async function GET(request: NextRequest) {
   // Check API key
