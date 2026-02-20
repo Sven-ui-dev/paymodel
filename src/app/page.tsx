@@ -15,6 +15,7 @@ import { StatsBar } from "@/components/ui-extended/StatsBar";
 import { ModelTable } from "@/components/ui-extended/ModelTable";
 import { Bell, BarChart3, Github, Menu, ExternalLink, Zap, Target, DollarSign, Shield, TrendingUp, Eye } from "lucide-react";
 import Link from "next/link";
+import { getProviderLogo, getProviderColor } from "@/lib/providerLogos";
 
 export default function Home() {
   const [models, setModels] = useState<CurrentPrice[]>([]);
@@ -160,6 +161,35 @@ export default function Home() {
             <p className="text-xl text-muted-foreground mb-8">
               Aktuelle Token-Preise, Geschwindigkeit und Qualität der wichtigsten AI-Modelle im direkten Vergleich. 100% neutral und unabhängig von Anbietern. Keine Verwendung von Affiliate-Links.
             </p>
+            
+            {/* Provider Logos */}
+            <div className="flex flex-wrap gap-4 justify-center mb-8">
+              {providers.slice(0, 12).map((provider) => (
+                <div 
+                  key={provider.id}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border/50"
+                >
+                  <img 
+                    src={getProviderLogo(provider.slug) || ''} 
+                    alt={provider.name}
+                    className="w-5 h-5 rounded"
+                    style={{ 
+                      backgroundColor: getProviderColor(provider.slug),
+                      display: getProviderLogo(provider.slug) ? 'block' : 'none'
+                    }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  <span 
+                    className="w-2 h-2 rounded-full" 
+                    style={{ backgroundColor: getProviderColor(provider.slug) }}
+                  />
+                  <span className="text-sm font-medium">{provider.name}</span>
+                </div>
+              ))}
+            </div>
+            
             <div className="flex flex-wrap gap-3 justify-center">
               <Button asChild size="lg">
                 <a href="#preisvergleich">Preisvergleich</a>

@@ -18,10 +18,11 @@ export function Navbar({ user }: NavbarProps) {
         <div className="flex h-14 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg hidden sm:inline">paymodel.ai</span>
+            <img 
+              src="/logo.svg" 
+              alt="paymodel.ai" 
+              className="h-8 w-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}

@@ -1,10 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
-  <!-- Background pill shape -->
-  <rect x="0" y="4" width="40" height="32" rx="8" fill="#10b981"/>
-  
-  <!-- Dollar sign -->
-  <text x="20" y="27" font-family="system-ui, sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">€</text>
-  
-  <!-- Text -->
-  <text x="50" y="27" font-family="system-ui, sans-serif" font-size="18" font-weight="600" fill="currentColor">paymodel.ai</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="68" viewBox="0 0 300 68">
+  <text x="0" y="36" font-family="Plus Jakarta Sans, sans-serif" font-size="34" font-weight="800" fill="#2ECC71" letter-spacing="-0.5">Pay</text>
+  <text x="62" y="36" font-family="Plus Jakarta Sans, sans-serif" font-size="34" font-weight="300" fill="#FFFFFF" letter-spacing="-0.5">Clear</text>
+  <text x="175" y="36" font-family="Plus Jakarta Sans, sans-serif" font-size="34" font-weight="300" fill="rgba(46,204,113,0.6)" letter-spacing="-0.5">.ai</text>
+  <text x="0" y="58" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="500" fill="#4A5C70" letter-spacing="1.5">POWERED BY</text>
+  <circle cx="88" cy="54" r="5" fill="none" stroke="#2ECC71" stroke-width="1"/>
+  <line x1="88" y1="49" x2="88" y2="52" stroke="#2ECC71" stroke-width="1" stroke-linecap="round"/>
+  <text x="96" y="58" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="700" fill="#6B7C93" letter-spacing="0.5">ONCLEAR</text>
 </svg>
