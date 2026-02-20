@@ -60,6 +60,7 @@ export type CurrentPrice = {
   model_id: string;
   model_name: string;
   model_slug: string;
+  sort_order: number;
   provider_id: string;
   provider_name: string;
   provider_slug: string;
@@ -107,7 +108,7 @@ export async function getModels(filters?: { providerSlug?: string; useCaseSlug?:
   let query = supabase
     .from('current_prices')
     .select('*')
-    .order('model_name', { ascending: true });
+    .order('sort_order', { ascending: true });
 
   if (filters?.providerSlug) {
     query = query.eq('provider_slug', filters.providerSlug);

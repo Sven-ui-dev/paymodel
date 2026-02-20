@@ -148,6 +148,7 @@ SELECT
     m.id as model_id,
     m.name as model_name,
     m.slug as model_slug,
+    m.sort_order,
     p.id as provider_id,
     p.name as provider_name,
     p.slug as provider_slug,
