@@ -14,27 +14,30 @@ async function verifyApiKey(request: NextRequest) {
   const key = authHeader.replace('Bearer ', '');
   const keyHash = require('crypto').createHash('sha256').update(key).digest('hex');
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
-  
-  const { data: apiKey, error } = await supabase
-    .from('api_keys')
-    .select('id, user_id, is_active, expires_at')
-    .eq('key_hash', keyHash)
-    .single();
+  try {
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const { data: apiKey, error } = await supabase
+      .from('api_keys')
+      .select('id, user_id, is_active, expires_at')
+      .eq('key_hash', keyHash)
+      .single();
 
-  if (error || !apiKey) {
+    if (error || !apiKey) {
+      return { error: 'Invalid API key', status: 401 };
+    }
+
+    if (!apiKey.is_active) {
+      return { error: 'API key is deactivated', status: 403 };
+    }
+
+    if (apiKey.expires_at && new Date(apiKey.expires_at) < new Date()) {
+      return { error: 'API key has expired', status: 403 };
+    }
+
+    return { userId: apiKey.user_id, keyId: apiKey.id };
+  } catch {
     return { error: 'Invalid API key', status: 401 };
   }
-
-  if (!apiKey.is_active) {
-    return { error: 'API key is deactivated', status: 403 };
-  }
-
-  if (apiKey.expires_at && new Date(apiKey.expires_at) < new Date()) {
-    return { error: 'API key has expired', status: 403 };
-  }
-
-  return { userId: apiKey.user_id, keyId: apiKey.id };
 }
 
 // GET /api/v1/models - List all models

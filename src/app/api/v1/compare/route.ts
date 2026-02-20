@@ -14,7 +14,7 @@ async function verifyApiKey(request: NextRequest) {
   const key = authHeader.replace('Bearer ', '');
   const keyHash = require('crypto').createHash('sha256').update(key).digest('hex');
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  try {
   
   const { data: apiKey, error } = await supabase
     .from('api_keys')
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'models array is required' }, { status: 400 });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    try {
     const { data, error } = await supabase
       .from('current_prices')
       .select('model_name, model_slug, provider_name, provider_slug, input_price_per_million, output_price_per_million, currency, context_window')
