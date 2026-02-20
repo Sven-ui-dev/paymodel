@@ -377,10 +377,17 @@ async function sync() {
         newModels++;
         console.log(`🆕 ${name} (${providerName}): €${inputPrice.toFixed(4)}/€${outputPrice.toFixed(4)}`);
       } else {
-        // Check if price exists for today
+        // Update sort_order for existing model
         const existingModel = existingModels.find(m => m.slug === slug);
         const modelId = existingModel?.id;
         
+        if (modelId && existingModel?.sort_order !== sortOrder) {
+          await httpRequest(`/models?id=eq.${modelId}`, 'PATCH', {
+            sort_order: sortOrder
+          });
+        }
+        
+        // Check if price exists for today
         if (modelId && latestPrices[modelId]) {
           const pricing = model.pricing || {};
           const inputPrice = (parseFloat(pricing.prompt || 0)) * 1000000 * exchangeRate;
