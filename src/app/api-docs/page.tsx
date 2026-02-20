@@ -3,7 +3,6 @@
 import { Navbar } from "@/components/ui-extended/Navbar";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Terminal, Copy, Check } from "lucide-react";
 import { useState } from "react";
@@ -358,7 +357,6 @@ models = client.models.list(
               </p>
               <ul className="space-y-2 text-sm">
                 <li>📧 E-Mail: <a href="mailto:support@paymodel.ai" className="text-primary hover:underline">support@paymodel.ai</a></li>
-                <li>📖 Dokumentation: <Link href="/docs" className="text-primary hover:underline">docs.paymodel.ai</Link></li>
                 <li>💬 Discord: <a href="https://discord.gg/paymodel" className="text-primary hover:underline">discord.gg/paymodel</a></li>
               </ul>
             </CardContent>
