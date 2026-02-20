@@ -344,7 +344,12 @@ export default function Home() {
             
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex gap-4 p-4">
-                <div className="text-3xl">📊</div>
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                >
+                  <BarChart3 className="w-5 h-5" style={{ color: '#2ECC71' }} />
+                </div>
                 <div>
                   <h4 className="font-semibold mb-1">Live-Preisvergleich</h4>
                   <p className="text-sm text-muted-foreground">
@@ -354,7 +359,12 @@ export default function Home() {
               </div>
               
               <div className="flex gap-4 p-4">
-                <div className="text-3xl">🎯</div>
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                >
+                  <Zap className="w-5 h-5" style={{ color: '#2ECC71' }} />
+                </div>
                 <div>
                   <h4 className="font-semibold mb-1">Personalisierte Benchmarks</h4>
                   <p className="text-sm text-muted-foreground">
@@ -364,7 +374,12 @@ export default function Home() {
               </div>
               
               <div className="flex gap-4 p-4">
-                <div className="text-3xl">💰</div>
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                >
+                  <TrendingUp className="w-5 h-5" style={{ color: '#2ECC71' }} />
+                </div>
                 <div>
                   <h4 className="font-semibold mb-1">Kosten-Dashboard</h4>
                   <p className="text-sm text-muted-foreground">
@@ -374,7 +389,12 @@ export default function Home() {
               </div>
               
               <div className="flex gap-4 p-4">
-                <div className="text-3xl">🔔</div>
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                >
+                  <Bell className="w-5 h-5" style={{ color: '#2ECC71' }} />
+                </div>
                 <div>
                   <h4 className="font-semibold mb-1">Preis-Alerts</h4>
                   <p className="text-sm text-muted-foreground">
@@ -384,7 +404,12 @@ export default function Home() {
               </div>
               
               <div className="flex gap-4 p-4">
-                <div className="text-3xl">📈</div>
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                >
+                  <Shield className="w-5 h-5" style={{ color: '#2ECC71' }} />
+                </div>
                 <div>
                   <h4 className="font-semibold mb-1">ROI-Reports</h4>
                   <p className="text-sm text-muted-foreground">
@@ -394,7 +419,12 @@ export default function Home() {
               </div>
               
               <div className="flex gap-4 p-4">
-                <div className="text-3xl">🔒</div>
+                <div 
+                  className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                >
+                  <Shield className="w-5 h-5" style={{ color: '#2ECC71' }} />
+                </div>
                 <div>
                   <h4 className="font-semibold mb-1">DSGVO-konform</h4>
                   <p className="text-sm text-muted-foreground">
