@@ -19,12 +19,11 @@ export default function ImpressumPage() {
 
         <div className="space-y-6 text-muted-foreground">
           <div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Angaben gemäß § 5 TMG</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Angaben gemäß § 5 DDG</h3>
             <p className="font-semibold text-foreground">Sven Grewe</p>
-            <p>── ADRESSE EINGEBEN ──</p>
-            <p className="text-red-500 text-sm mt-1">
-              * Bitte hier Ihre ladungsfähige Anschrift eintragen
-            </p>
+            <p>c/o Impressumservice Dein-Impressum</p>
+            <p>Stettiner Straße 41</p>
+            <p>35410 Hungen</p>
             <p className="mt-4">E-Mail: info@paymodel.ai</p>
           </div>
 
