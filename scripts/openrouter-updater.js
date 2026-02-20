@@ -381,6 +381,11 @@ async function updatePrices() {
           } else {
             skipped++;
           }
+        } else if (modelId) {
+          // Model exists but has no price for today - add it
+          await insertPrice(modelId, inputPriceEur, outputPriceEur);
+          updatedPrices++;
+          console.log(`➕ ${name}: Preis hinzugefügt (€${inputPriceEur.toFixed(4)}/€${outputPriceEur.toFixed(4)})`);
         } else {
           skipped++;
         }
