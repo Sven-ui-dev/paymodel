@@ -16,7 +16,18 @@ interface ModelTableProps {
   userId?: string;
 }
 
-export function ModelTable({ models, favorites, onFavorite, compact = false, userId }: ModelTableProps) {
+      </div>
+    </div>
+  );
+}
+
+function ModelTableWithModal({ 
+  models, 
+  favorites, 
+  onFavorite, 
+  compact = false, 
+  userId 
+}: ModelTableProps) {
   const [sortField, setSortField] = useState<keyof CurrentPrice>("sort_order");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedModel, setSelectedModel] = useState<CurrentPrice | null>(null);
@@ -274,4 +285,8 @@ export function ModelTable({ models, favorites, onFavorite, compact = false, use
       />
     )}
   );
+}
+
+export function ModelTable(props: ModelTableProps) {
+  return <ModelTableWithModal {...props} />;
 }
