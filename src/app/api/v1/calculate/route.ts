@@ -1,10 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Verify API key
 async function verifyApiKey(request: NextRequest) {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader?.startsWith('pk_')) {
@@ -12,32 +13,33 @@ async function verifyApiKey(request: NextRequest) {
   }
 
   const key = authHeader.replace('Bearer ', '');
-  const keyHash = require('crypto').createHash('sha256').update(key).digest('hex');
+  const keyHash = crypto.createHash('sha256').update(key).digest('hex');
 
   try {
-  
-  const { data: apiKey, error } = await supabase
-    .from('api_keys')
-    .select('id, user_id, is_active, expires_at')
-    .eq('key_hash', keyHash)
-    .single();
+    const { data: apiKey, error } = await supabase
+      .from('api_keys')
+      .select('id, user_id, is_active, expires_at')
+      .eq('key_hash', keyHash)
+      .single();
 
-  if (error || !apiKey) {
+    if (error || !apiKey) {
+      return { error: 'Invalid API key', status: 401 };
+    }
+
+    if (!apiKey.is_active) {
+      return { error: 'API key is deactivated', status: 403 };
+    }
+
+    if (apiKey.expires_at && new Date(apiKey.expires_at) < new Date()) {
+      return { error: 'API key has expired', status: 403 };
+    }
+
+    return { userId: apiKey.user_id, keyId: apiKey.id };
+  } catch {
     return { error: 'Invalid API key', status: 401 };
   }
-
-  if (!apiKey.is_active) {
-    return { error: 'API key is deactivated', status: 403 };
-  }
-
-  if (apiKey.expires_at && new Date(apiKey.expires_at) < new Date()) {
-    return { error: 'API key has expired', status: 403 };
-  }
-
-  return { userId: apiKey.user_id, keyId: apiKey.id };
 }
 
-// POST /api/v1/calculate - Calculate costs for a model
 export async function POST(request: NextRequest) {
   try {
     const auth = await verifyApiKey(request);
@@ -52,7 +54,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'model is required' }, { status: 400 });
     }
 
-    try {
     const { data, error } = await supabase
       .from('current_prices')
       .select('model_name, model_slug, provider_name, provider_slug, input_price_per_million, output_price_per_million, currency, context_window')
@@ -63,21 +64,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Model not found' }, { status: 404 });
     }
 
-    // Calculate one-time costs
     const inputTokens = input_tokens || 0;
     const outputTokens = output_tokens || 0;
     const inputCost = (inputTokens / 1000000) * data.input_price_per_million;
     const outputCost = (outputTokens / 1000000) * data.output_price_per_million;
     const totalCost = inputCost + outputCost;
 
-    // Calculate monthly costs
     const monthlyInput = monthly_input || 0;
     const monthlyOutput = monthly_output || 0;
     const monthlyInputCost = (monthlyInput / 1000000) * data.input_price_per_million;
     const monthlyOutputCost = (monthlyOutput / 1000000) * data.output_price_per_million;
     const totalMonthlyCost = monthlyInputCost + monthlyOutputCost;
-
-    // Yearly projection
     const yearlyCost = totalMonthlyCost * 12;
 
     return NextResponse.json({
