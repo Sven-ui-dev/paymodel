@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useState, useEffect } from 'react';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
+import { Navbar } from '@/components/ui-extended/Navbar';
 
 const PLANS = [
   {
@@ -70,27 +71,10 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b sticky top-0 bg-background/95 backdrop-blur z-10">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="font-bold text-xl">
-              paymodel.ai
-            </Link>
-            <nav className="flex items-center gap-4">
-              {user ? (
-                <Link href="/dashboard" className="text-sm font-medium">
-                  Dashboard
-                </Link>
-              ) : (
-                <Link href="/login" className="text-sm font-medium">
-                  Login
-                </Link>
-              )}
-            </nav>
-          </div>
-        </div>
-      </header>
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Pricing Content */}
 
       <main className="py-16 px-4">
         <div className="container mx-auto max-w-5xl">

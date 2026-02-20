@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Send, CheckCircle } from "lucide-react";
+import { Navbar } from "@/components/ui-extended/Navbar";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -62,11 +63,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold">🤖 paymodel.ai</h1>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="container mx-auto px-4 py-8 max-w-xl">
         <Card>
