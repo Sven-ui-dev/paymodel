@@ -1,4 +1,3 @@
--- Benchmark Results Table
 CREATE TABLE benchmark_results (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
@@ -16,21 +15,16 @@ CREATE TABLE benchmark_results (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Indexes
 CREATE INDEX idx_benchmark_results_user ON benchmark_results(user_id);
 CREATE INDEX idx_benchmark_results_created ON benchmark_results(created_at DESC);
 
--- RLS Policies
 ALTER TABLE benchmark_results ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view own benchmark results" ON benchmark_results
-    FOR SELECT
-    USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can create own benchmark results" ON benchmark_results
-    FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete own benchmark results" ON benchmark_results
-    FOR DELETE
-    USING (auth.uid() = user_id);
+    FOR DELETE USING (auth.uid() = user_id);
