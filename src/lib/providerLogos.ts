@@ -92,6 +92,11 @@ export function getProviderLogo(providerSlug: string): string | null {
     return providerLogos[baseSlug];
   }
   
+  // Special cases
+  if (providerSlug.includes('anthropic')) {
+    return 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_Logo.svg';
+  }
+  
   return null;
 }
 
@@ -105,6 +110,15 @@ export function getProviderColor(providerSlug: string): string {
   const baseSlug = providerSlug.split('-')[0];
   if (providerColors[baseSlug]) {
     return providerColors[baseSlug];
+  }
+  
+  // Special cases
+  if (providerSlug.includes('anthropic')) {
+    return '#D97757';
+  }
+  
+  if (providerSlug.includes('minimax')) {
+    return '#6B4EFF';
   }
   
   // Fallback to accent color
