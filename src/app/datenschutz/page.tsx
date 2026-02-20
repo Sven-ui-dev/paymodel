@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { Navbar } from "@/components/ui-extended/Navbar";
+
 export const metadata = {
   title: "Datenschutz - paymodel.ai",
   description: "Datenschutzerklärung von paymodel.ai",
@@ -5,12 +8,8 @@ export const metadata = {
 
 export default function DatenschutzPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold">🤖 paymodel.ai</h1>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar />
 
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         <h2 className="text-3xl font-bold mb-6">Datenschutzerklärung</h2>
@@ -99,6 +98,18 @@ export default function DatenschutzPage() {
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t py-8 px-4 mt-auto">
+        <div className="container mx-auto text-center text-sm text-muted-foreground">
+          <p>© 2026 paymodel.ai – Alle Rechte vorbehalten.</p>
+          <div className="flex justify-center gap-4 mt-2">
+            <Link href="/impressum" className="hover:underline">Impressum</Link>
+            <Link href="/datenschutz" className="hover:underline">Datenschutz</Link>
+            <a href="mailto:info@paymodel.ai" className="hover:underline">info@paymodel.ai</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
