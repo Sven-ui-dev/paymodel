@@ -201,6 +201,7 @@ export default function Home() {
                 models={filteredModels}
                 favorites={favorites}
                 onFavorite={handleFavorite}
+                userId={user?.id}
               />
             )}
           </div>

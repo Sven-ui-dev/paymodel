@@ -3,20 +3,24 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Star, StarOff, ChevronDown, ChevronUp } from "lucide-react";
+import { ExternalLink, Star, StarOff, ChevronDown, ChevronUp, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CurrentPrice } from "@/lib/supabase";
+import { CreatePriceAlertModal } from "@/components/CreatePriceAlertModal";
 
 interface ModelTableProps {
   models: CurrentPrice[];
   favorites: string[];
   onFavorite: (modelId: string) => void;
   compact?: boolean;
+  userId?: string;
 }
 
-export function ModelTable({ models, favorites, onFavorite, compact = false }: ModelTableProps) {
+export function ModelTable({ models, favorites, onFavorite, compact = false, userId }: ModelTableProps) {
   const [sortField, setSortField] = useState<keyof CurrentPrice>("sort_order");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [selectedModel, setSelectedModel] = useState<CurrentPrice | null>(null);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   const handleSort = (field: keyof CurrentPrice) => {
     if (sortField === field) {
@@ -55,6 +59,18 @@ export function ModelTable({ models, favorites, onFavorite, compact = false }: M
           </Badge>
         </div>
         <div className="flex items-center gap-2">
+          {userId && (
+            <button
+              onClick={() => {
+                setSelectedModel(model);
+                setIsAlertModalOpen(true);
+              }}
+              className="p-1 hover:bg-muted rounded transition-colors"
+              aria-label="Preis-Alert erstellen"
+            >
+              <Bell className="w-4 h-4 text-muted-foreground" />
+            </button>
+          )}
           <button
             onClick={() => onFavorite(model.model_id)}
             className="p-1 hover:bg-muted rounded transition-colors"
@@ -220,6 +236,19 @@ export function ModelTable({ models, favorites, onFavorite, compact = false }: M
                   </div>
                 </td>
                 <td className="p-3 text-right">
+                  {userId && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setSelectedModel(model);
+                        setIsAlertModalOpen(true);
+                      }}
+                      title="Preis-Alert erstellen"
+                    >
+                      <Bell className="w-4 h-4" />
+                    </Button>
+                  )}
                   <Button variant="ghost" size="icon" asChild>
                     <a href={model.affiliate_url} target="_blank" rel="noopener noreferrer">
                       <ExternalLink className="w-4 h-4" />
@@ -232,5 +261,17 @@ export function ModelTable({ models, favorites, onFavorite, compact = false }: M
         </table>
       </div>
     </div>
+
+    {selectedModel && userId && (
+      <CreatePriceAlertModal
+        isOpen={isAlertModalOpen}
+        onClose={() => {
+          setIsAlertModalOpen(false);
+          setSelectedModel(null);
+        }}
+        model={selectedModel}
+        userId={userId}
+      />
+    )}
   );
 }
