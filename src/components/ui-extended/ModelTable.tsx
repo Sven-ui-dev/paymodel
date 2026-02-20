@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Star, StarOff, ChevronDown, ChevronUp, Bell } from "lucide-react";
 import type { CurrentPrice } from "@/lib/supabase";
 import { CreatePriceAlertModal } from "@/components/CreatePriceAlertModal";
+import { getProviderLogo, getProviderColor } from "@/lib/providerLogos";
 
 interface ModelTableProps {
   models: CurrentPrice[];
@@ -74,9 +75,35 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
           <h4 className="font-semibold truncate">{model.model_name}</h4>
-          <Badge variant="outline" className="mt-1 text-xs">
-            {model.provider_name}
-          </Badge>
+          <div className="flex items-center gap-1.5 mt-1">
+            {model.provider_slug && (
+              <img 
+                src={getProviderLogo(model.provider_slug) || ''} 
+                alt={model.provider_name}
+                className="w-4 h-4 rounded"
+                style={{ 
+                  backgroundColor: getProviderColor(model.provider_slug),
+                  display: getProviderLogo(model.provider_slug) ? 'block' : 'none'
+                }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            )}
+            <Badge 
+              variant="outline" 
+              className="text-xs gap-1"
+              style={{ borderColor: getProviderColor(model.provider_slug) }}
+            >
+              {model.provider_slug && (
+                <span 
+                  className="w-1.5 h-1.5 rounded-full" 
+                  style={{ backgroundColor: getProviderColor(model.provider_slug) }}
+                />
+              )}
+              {model.provider_name}
+            </Badge>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {userId && (
@@ -238,7 +265,35 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
                 </td>
                 <td className="p-3 font-medium">{model.model_name}</td>
                 <td className="p-3">
-                  <Badge variant="outline">{model.provider_name}</Badge>
+                  <div className="flex items-center gap-2">
+                    {model.provider_slug && (
+                      <img 
+                        src={getProviderLogo(model.provider_slug) || ''} 
+                        alt={model.provider_name}
+                        className="w-5 h-5 rounded"
+                        style={{ 
+                          backgroundColor: getProviderColor(model.provider_slug),
+                          display: getProviderLogo(model.provider_slug) ? 'block' : 'none'
+                        }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    )}
+                    <Badge 
+                      variant="outline" 
+                      className="gap-1"
+                      style={{ borderColor: getProviderColor(model.provider_slug) }}
+                    >
+                      {model.provider_slug && (
+                        <span 
+                          className="w-2 h-2 rounded-full" 
+                          style={{ backgroundColor: getProviderColor(model.provider_slug) }}
+                        />
+                      )}
+                      {model.provider_name}
+                    </Badge>
+                  </div>
                 </td>
                 <td className="p-3 text-right font-medium">
                   {formatPrice(model.input_price_per_million)}
