@@ -68,6 +68,8 @@ export default function Home() {
 
   useEffect(() => {
     let filtered = models;
+    // Filter out free models
+    filtered = filtered.filter((m) => m.input_price > 0 || m.output_price > 0);
     if (selectedProvider) {
       filtered = filtered.filter((m) => m.provider_slug === selectedProvider);
     }
