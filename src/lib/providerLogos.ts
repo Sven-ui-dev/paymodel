@@ -67,7 +67,6 @@ export const providerColors: Record<string, string> = {
   'sambanova': '#000000',
   'abacus': '#000000',
   'ai21': '#000000',
-  'cohere': '#000000',
 };
 
 export function getProviderLogo(providerSlug: string): string | null {
