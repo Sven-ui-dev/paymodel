@@ -5,18 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Star, StarOff, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-export interface CurrentPrice {
-  model_id: number;
-  model_name: string;
-  provider_name: string;
-  provider_slug: string;
-  input_price_per_million: number;
-  output_price_per_million: number;
-  context_window: number;
-  capabilities: string[];
-  affiliate_url?: string;
-}
+import type { CurrentPrice } from "@/lib/supabase";
 
 interface ModelTableProps {
   models: CurrentPrice[];
@@ -39,8 +28,8 @@ export function ModelTable({ models, favorites, onFavorite, compact = false }: M
   };
 
   const sortedModels = [...models].sort((a, b) => {
-    const aVal = a[sortField];
-    const bVal = b[sortField];
+    const aVal = a[sortField as keyof CurrentPrice];
+    const bVal = b[sortField as keyof CurrentPrice];
     
     if (typeof aVal === "number" && typeof bVal === "number") {
       return sortDirection === "asc" ? aVal - bVal : bVal - aVal;
@@ -67,11 +56,11 @@ export function ModelTable({ models, favorites, onFavorite, compact = false }: M
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onFavorite(String(model.model_id))}
+            onClick={() => onFavorite(model.model_id)}
             className="p-1 hover:bg-muted rounded transition-colors"
-            aria-label={favorites.includes(String(model.model_id)) ? "Remove from favorites" : "Add to favorites"}
+            aria-label={favorites.includes(model.model_id) ? "Remove from favorites" : "Add to favorites"}
           >
-            {favorites.includes(String(model.model_id)) ? (
+            {favorites.includes(model.model_id) ? (
               <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
             ) : (
               <StarOff className="w-4 h-4 text-muted-foreground" />
@@ -195,11 +184,11 @@ export function ModelTable({ models, favorites, onFavorite, compact = false }: M
               <tr key={model.model_id} className="border-t hover:bg-muted/30 transition-colors">
                 <td className="p-3">
                   <button
-                    onClick={() => onFavorite(String(model.model_id))}
+                    onClick={() => onFavorite(model.model_id)}
                     className="p-1 hover:bg-muted rounded transition-colors"
-                    aria-label={favorites.includes(String(model.model_id)) ? "Remove from favorites" : "Add to favorites"}
+                    aria-label={favorites.includes(model.model_id) ? "Remove from favorites" : "Add to favorites"}
                   >
-                    {favorites.includes(String(model.model_id)) ? (
+                    {favorites.includes(model.model_id) ? (
                       <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                     ) : (
                       <StarOff className="w-4 h-4 text-muted-foreground" />
