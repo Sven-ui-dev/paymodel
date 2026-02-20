@@ -134,8 +134,6 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
             },
             body: JSON.stringify({
               prompt: testPrompt,
-              model_slug: model.model_slug,
-              provider_slug: model.provider_slug,
               ...result,
             }),
           });
