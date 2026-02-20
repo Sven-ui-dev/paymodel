@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Star, StarOff, ChevronDown, ChevronUp, Bell } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { CurrentPrice } from "@/lib/supabase";
 import { CreatePriceAlertModal } from "@/components/CreatePriceAlertModal";
 
@@ -16,18 +15,11 @@ interface ModelTableProps {
   userId?: string;
 }
 
-      </div>
-    </div>
-  );
+export function ModelTable(props: ModelTableProps) {
+  return <ModelTableWithModal {...props} />;
 }
 
-function ModelTableWithModal({ 
-  models, 
-  favorites, 
-  onFavorite, 
-  compact = false, 
-  userId 
-}: ModelTableProps) {
+function ModelTableWithModal({ models, favorites, onFavorite, compact = false, userId }: ModelTableProps) {
   const [sortField, setSortField] = useState<keyof CurrentPrice>("sort_order");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedModel, setSelectedModel] = useState<CurrentPrice | null>(null);
@@ -59,7 +51,24 @@ function ModelTableWithModal({
     return 0;
   });
 
-  // Mobile card view
+  const formatPrice = (price: number) => {
+    if (price === 0) return "Free";
+    return `€${price.toFixed(2)}/M`;
+  };
+
+  const formatContext = (tokens: number) => {
+    if (tokens >= 1000000) return `${(tokens / 1000000).toFixed(0)}M`;
+    if (tokens >= 1000) return `${(tokens / 1000).toFixed(0)}K`;
+    return tokens.toString();
+  };
+
+  const capabilityColors: Record<string, string> = {
+    text: "bg-blue-100 text-blue-800 border-blue-300",
+    coding: "bg-purple-100 text-purple-800 border-purple-300",
+    reasoning: "bg-orange-100 text-orange-800 border-orange-300",
+    vision: "bg-green-100 text-green-800 border-green-300",
+  };
+
   const MobileCardView = ({ model }: { model: CurrentPrice }) => (
     <div className="p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -104,19 +113,15 @@ function ModelTableWithModal({
       <div className="grid grid-cols-2 gap-3 text-sm">
         <div>
           <span className="text-muted-foreground text-xs">Input</span>
-          <p className="font-medium">€{model.input_price_per_million.toFixed(2)}/M</p>
+          <p className="font-medium">{formatPrice(model.input_price_per_million)}</p>
         </div>
         <div>
           <span className="text-muted-foreground text-xs">Output</span>
-          <p className="font-medium">€{model.output_price_per_million.toFixed(2)}/M</p>
+          <p className="font-medium">{formatPrice(model.output_price_per_million)}</p>
         </div>
         <div>
           <span className="text-muted-foreground text-xs">Kontext</span>
-          <p className="font-medium">
-            {model.context_window >= 1000000 
-              ? `${(model.context_window / 1000000).toFixed(0)}M`
-              : `${(model.context_window / 1000).toFixed(0)}K`}
-          </p>
+          <p className="font-medium">{formatContext(model.context_window)}</p>
         </div>
         <div>
           <span className="text-muted-foreground text-xs">Features</span>
@@ -138,20 +143,29 @@ function ModelTableWithModal({
         {sortedModels.slice(0, 10).map((model) => (
           <MobileCardView key={model.model_id} model={model} />
         ))}
+        {selectedModel && userId && (
+          <CreatePriceAlertModal
+            isOpen={isAlertModalOpen}
+            onClose={() => {
+              setIsAlertModalOpen(false);
+              setSelectedModel(null);
+            }}
+            model={selectedModel}
+            userId={userId}
+          />
+        )}
       </div>
     );
   }
 
   return (
     <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-      {/* Mobile Card View */}
       <div className="md:hidden space-y-3">
         {sortedModels.slice(0, 20).map((model) => (
           <MobileCardView key={model.model_id} model={model} />
         ))}
       </div>
 
-      {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto rounded-lg border">
         <table className="w-full text-sm">
           <thead className="bg-muted/50">
@@ -227,20 +241,18 @@ function ModelTableWithModal({
                   <Badge variant="outline">{model.provider_name}</Badge>
                 </td>
                 <td className="p-3 text-right font-medium">
-                  €{model.input_price_per_million.toFixed(2)}
+                  {formatPrice(model.input_price_per_million)}
                 </td>
                 <td className="p-3 text-right font-medium">
-                  €{model.output_price_per_million.toFixed(2)}
+                  {formatPrice(model.output_price_per_million)}
                 </td>
                 <td className="p-3 text-right text-muted-foreground">
-                  {model.context_window >= 1000000 
-                    ? `${(model.context_window / 1000000).toFixed(0)}M`
-                    : `${(model.context_window / 1000).toFixed(0)}K`}
+                  {formatContext(model.context_window)}
                 </td>
                 <td className="p-3 hidden lg:table-cell">
                   <div className="flex gap-1 flex-wrap">
                     {model.capabilities?.slice(0, 3).map((cap) => (
-                      <Badge key={cap} variant="secondary" className="text-xs">
+                      <Badge key={cap} variant="secondary" className={`text-xs ${capabilityColors[cap] || ""}`}>
                         {cap}
                       </Badge>
                     ))}
@@ -271,22 +283,18 @@ function ModelTableWithModal({
           </tbody>
         </table>
       </div>
+
+      {selectedModel && userId && (
+        <CreatePriceAlertModal
+          isOpen={isAlertModalOpen}
+          onClose={() => {
+            setIsAlertModalOpen(false);
+            setSelectedModel(null);
+          }}
+          model={selectedModel}
+          userId={userId}
+        />
+      )}
     </div>
-
-    {selectedModel && userId && (
-      <CreatePriceAlertModal
-        isOpen={isAlertModalOpen}
-        onClose={() => {
-          setIsAlertModalOpen(false);
-          setSelectedModel(null);
-        }}
-        model={selectedModel}
-        userId={userId}
-      />
-    )}
   );
-}
-
-export function ModelTable(props: ModelTableProps) {
-  return <ModelTableWithModal {...props} />;
 }
