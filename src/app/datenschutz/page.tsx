@@ -19,7 +19,9 @@ export default function DatenschutzPage() {
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-2">1. Verantwortlicher</h3>
             <p>Sven Grewe</p>
-            <p>── ADRESSE EINGEBEN ──</p>
+            <p>c/o Impressumservice Dein-Impressum</p>
+            <p>Stettiner Straße 41</p>
+            <p>35410 Hungen</p>
             <p>E-Mail: info@paymodel.ai</p>
           </div>
 
@@ -55,17 +57,17 @@ export default function DatenschutzPage() {
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-2">5. Analyse-Tools</h3>
             <p>
-              Wir nutzen keine Analyse-Tools (wie Google Analytics). Unsere Website 
-              erhebt ausschließlich die technisch notwendigen Daten für den Betrieb.
+              Wir nutzen Vercel Speed Insights zur Analyse der Website-Performance. 
+              Es werden keine personenbezogenen Daten an Dritte weitergegeben.
+              Wir erheben ausschließlich die technisch notwendigen Daten für den Betrieb.
             </p>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">6. Zahlungsabwicklung</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">6. Externe Links</h3>
             <p>
-              Zahlungen werden über Stripe abgewickelt. Dabei werden Ihre Zahlungsdaten 
-              ausschließlich von Stripe verarbeitet. Wir erhalten lediglich die 
-             Informationen, die für die Bestellabwicklung erforderlich sind.
+              Unsere Website enthält Links zu externen Anbietern (z.B. OpenAI, Anthropic). 
+              Für deren Datenschutzpraktiken sind wir nicht verantwortlich.
             </p>
           </div>
 
