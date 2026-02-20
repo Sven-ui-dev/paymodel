@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100');
     const offset = parseInt(searchParams.get('offset') || '0');
 
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
     let query = supabase
       .from('current_prices')
       .select('model_name, model_slug, provider_name, provider_slug, input_price_per_million, output_price_per_million, currency, context_window, capabilities, sort_order')

@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'model is required' }, { status: 400 });
     }
 
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
     const { data, error } = await supabase
       .from('current_prices')
       .select('model_name, model_slug, provider_name, provider_slug, input_price_per_million, output_price_per_million, currency, context_window')
