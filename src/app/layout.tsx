@@ -34,6 +34,10 @@ export const metadata: Metadata = {
       "Vergleiche Token-Preise, Context-Windows und Capabilities von allen großen AI-Providern.",
     type: "website",
   },
+  icons: {
+    icon: "/favicon.svg",
+    type: "image/svg+xml",
+  },
 };
 
 export default function RootLayout({
