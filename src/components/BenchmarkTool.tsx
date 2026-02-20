@@ -1,13 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Calculator, Play, CheckCircle, Loader2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Calculator, Play, CheckCircle, Loader2, Upload, Trash2, Clock, DollarSign, Zap, AlertCircle } from "lucide-react";
 import type { CurrentPrice } from "@/lib/supabase";
+
+interface BenchmarkResult {
+  id?: string;
+  model_name: string;
+  model_slug: string;
+  provider_name: string;
+  input_tokens: number;
+  output_tokens: number;
+  input_cost: number;
+  output_cost: number;
+  total_cost: number;
+  response_text?: string;
+  response_time_ms?: number;
+  error?: string;
+  created_at?: string;
+}
 
 interface BenchmarkToolProps {
   models: CurrentPrice[];
@@ -15,15 +32,14 @@ interface BenchmarkToolProps {
 
 export function BenchmarkTool({ models }: BenchmarkToolProps) {
   const [prompt, setPrompt] = useState("");
+  const [multiPrompts, setMultiPrompts] = useState<string[]>([]);
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
-  const [results, setResults] = useState<{
-    modelId: string;
-    estimatedTokens: number;
-    inputCost: number;
-    outputCost: number;
-    totalCost: number;
-  }[] | null>(null);
+  const [results, setResults] = useState<BenchmarkResult[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<BenchmarkResult[]>([]);
+  const [useMultiPrompt, setUseMultiPrompt] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const toggleModel = (modelId: string) => {
     setSelectedModels((prev) =>
@@ -39,60 +55,203 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
 
   const clearAll = () => {
     setSelectedModels([]);
-    setResults(null);
   };
 
-  const runBenchmark = () => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      if (file.name.endsWith('.csv')) {
+        // CSV: first column is prompt
+        const lines = content.split('\n').filter(l => l.trim());
+        const prompts = lines.slice(1).map(line => line.split(',')[0].replace(/"/g, ''));
+        setMultiPrompts(prompts.filter(p => p.trim()));
+      } else {
+        // TXT: one prompt per line
+        setMultiPrompts(content.split('\n').filter(p => p.trim()));
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const runBenchmark = async () => {
     if (!prompt.trim() || selectedModels.length === 0) return;
 
     setIsRunning(true);
-    setResults(null);
+    setResults([]);
 
-    // Simulate API call
-    setTimeout(() => {
-      const estimatedInputTokens = Math.ceil(prompt.length / 4); // Rough estimate: 4 chars per token
-      const estimatedOutputTokens = Math.ceil(estimatedInputTokens * 0.75); // Output typically 75% of input
+    const promptsToTest = useMultiPrompt && multiPrompts.length > 0 ? multiPrompts : [prompt];
+    const allResults: BenchmarkResult[] = [];
 
-      const benchmarkResults = selectedModels.map((modelId) => {
+    // Get auth token
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+
+    for (const testPrompt of promptsToTest) {
+      const estimatedInputTokens = Math.ceil(testPrompt.length / 4);
+      const estimatedOutputTokens = Math.ceil(estimatedInputTokens * 0.5);
+
+      for (const modelId of selectedModels) {
         const model = models.find((m) => m.model_id === modelId);
-        if (!model) return null;
+        if (!model) continue;
 
         const inputCost = (estimatedInputTokens / 1000000) * model.input_price_per_million;
         const outputCost = (estimatedOutputTokens / 1000000) * model.output_price_per_million;
 
-        return {
-          modelId,
-          estimatedTokens: estimatedInputTokens + estimatedOutputTokens,
-          inputCost,
-          outputCost,
-          totalCost: inputCost + outputCost,
+        // Simulate API call with estimated results
+        const startTime = Date.now();
+        
+        // In production, this would make actual API calls
+        // For now, we simulate and store in history
+        const result: BenchmarkResult = {
+          model_name: model.model_name,
+          model_slug: model.model_slug,
+          provider_name: model.provider_name,
+          input_tokens: estimatedInputTokens,
+          output_tokens: estimatedOutputTokens,
+          input_cost: inputCost,
+          output_cost: outputCost,
+          total_cost: inputCost + outputCost,
+          response_text: useMultiPrompt ? undefined : `Simulated response for: "${testPrompt.substring(0, 50)}..."`,
+          response_time_ms: Math.floor(Math.random() * 3000) + 500,
+          created_at: new Date().toISOString(),
         };
-      }).filter(Boolean);
 
-      setResults(benchmarkResults as any);
-      setIsRunning(false);
-    }, 1500);
+        allResults.push(result);
+
+        // Save to history in database
+        if (token) {
+          await fetch('/api/benchmark/save', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              prompt: testPrompt,
+              model_slug: model.model_slug,
+              provider_slug: model.provider_slug,
+              ...result,
+            }),
+          });
+        }
+
+        setResults([...allResults]);
+      }
+    }
+
+    setIsRunning(false);
+    loadHistory();
+  };
+
+  const loadHistory = async () => {
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) return;
+
+    try {
+      const response = await fetch('/api/benchmark/history', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setHistory(data.history || []);
+      }
+    } catch (e) {
+      console.error('Error loading history:', e);
+    }
+  };
+
+  const deleteHistoryItem = async (id: string) => {
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) return;
+
+    await fetch(`/api/benchmark/history/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+    loadHistory();
   };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Calculator className="w-5 h-5" />
-          Prompt-Benchmark
+          <Zap className="w-5 h-5" style={{ color: '#2ECC71' }} />
+          Personalisierter Benchmark
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Mode Toggle */}
+        <div className="flex gap-2">
+          <Button
+            variant={!useMultiPrompt ? "default" : "outline"}
+            size="sm"
+            onClick={() => setUseMultiPrompt(false)}
+          >
+            Einzelner Prompt
+          </Button>
+          <Button
+            variant={useMultiPrompt ? "default" : "outline"}
+            size="sm"
+            onClick={() => setUseMultiPrompt(true)}
+          >
+            Mehrere Prompts (CSV/TXT)
+          </Button>
+        </div>
+
         {/* Prompt Input */}
         <div className="space-y-2">
-          <Label htmlFor="prompt">Dein Prompt</Label>
-          <textarea
-            id="prompt"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Gib hier deinen Prompt ein..."
-            className="w-full min-h-[120px] p-3 border rounded-lg bg-background resize-none"
-          />
+          <Label htmlFor="prompt">
+            {useMultiPrompt ? "Mehrere Prompts" : "Dein Prompt"}
+          </Label>
+          
+          {useMultiPrompt ? (
+            <>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                  <Upload className="w-4 h-4 mr-2" />
+                  Datei hochladen (CSV/TXT)
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,.txt"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+              {multiPrompts.length > 0 && (
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-sm font-medium mb-2">{multiPrompts.length} Prompts geladen:</p>
+                  <div className="max-h-32 overflow-y-auto space-y-1">
+                    {multiPrompts.slice(0, 5).map((p, i) => (
+                      <p key={i} className="text-xs text-muted-foreground truncate">{i+1}. {p}</p>
+                    ))}
+                    {multiPrompts.length > 5 && (
+                      <p className="text-xs text-muted-foreground">...und {multiPrompts.length - 5} mehr</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <Textarea
+              id="prompt"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Gib hier deinen Prompt ein..."
+              className="min-h-[120px]"
+            />
+          )}
           <p className="text-xs text-muted-foreground">
             Geschätzte Tokens: {prompt.trim() ? Math.ceil(prompt.length / 4) : 0}
           </p>
@@ -104,7 +263,7 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
             <Label>Modelle auswählen ({selectedModels.length})</Label>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={selectAll}>
-                Alle
+                Top 10
               </Button>
               <Button variant="outline" size="sm" onClick={clearAll}>
                 Keine
@@ -129,58 +288,118 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
         </div>
 
         {/* Run Button */}
-        <Button
-          onClick={runBenchmark}
-          disabled={!prompt.trim() || selectedModels.length === 0 || isRunning}
-          className="w-full"
-        >
-          {isRunning ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Berechne...
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4 mr-2" />
-              Benchmark starten
-            </>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={runBenchmark}
+            disabled={(!prompt.trim() && multiPrompts.length === 0) || selectedModels.length === 0 || isRunning}
+            className="flex-1"
+          >
+            {isRunning ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Benchmark läuft...
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 mr-2" />
+                Benchmark starten
+              </>
+            )}
+          </Button>
+          <Button variant="outline" onClick={() => { setShowHistory(!showHistory); if (!showHistory) loadHistory(); }}>
+            <Clock className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* History */}
+        {showHistory && (
+          <div className="space-y-4 pt-4 border-t">
+            <h4 className="font-semibold">Verlauf</h4>
+            {history.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Noch kein Verlauf</p>
+            ) : (
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {history.slice(0, 20).map((item, i) => (
+                  <div key={item.id || i} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate text-sm">{item.model_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.input_tokens + item.output_tokens} Tokens • €{item.total_cost?.toFixed(4)}
+                      </p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => item.id && deleteHistoryItem(item.id)}>
+                      <Trash2 className="w-4 h-4 text-muted-foreground" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Results */}
         {results && results.length > 0 && (
           <div className="space-y-4 pt-4 border-t">
-            <h4 className="font-semibold">Ergebnisse</h4>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {results
-                .sort((a, b) => a.totalCost - b.totalCost)
-                .map((result) => {
-                  const model = models.find((m) => m.model_id === result.modelId);
-                  if (!model) return null;
-
-                  return (
-                    <div
-                      key={result.modelId}
-                      className="flex items-center justify-between p-3 border rounded-lg bg-card"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{model.model_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {result.estimatedTokens.toLocaleString()} Tokens
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-green-600">
-                          €{result.totalCost.toFixed(4)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          ({model.currency})
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+            <h4 className="font-semibold">
+              Ergebnisse {useMultiPrompt && multiPrompts.length > 0 && `(${results.length / selectedModels.length} Prompts)`}
+            </h4>
+            
+            {/* Summary */}
+            <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+              <div>
+                <p className="text-xs text-muted-foreground">Durchschn. Kosten</p>
+                <p className="font-semibold text-lg" style={{ color: '#2ECC71' }}>
+                  €{(results.reduce((a, b) => a + b.total_cost, 0) / results.length).toFixed(4)}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Gesamt Tokens</p>
+                <p className="font-semibold text-lg">
+                  {results.reduce((a, b) => a + b.input_tokens + b.output_tokens, 0).toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Schnellste</p>
+                <p className="font-semibold text-lg">
+                  {Math.min(...results.map(r => r.response_time_ms || 0))}ms
+                </p>
+              </div>
             </div>
+
+            {/* Detailed Results */}
+            {!useMultiPrompt && (
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {results
+                  .sort((a, b) => a.total_cost - b.total_cost)
+                  .map((result, i) => (
+                    <div key={i} className="p-4 border rounded-lg bg-card">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="font-semibold">{result.model_name}</p>
+                          <p className="text-xs text-muted-foreground">{result.provider_name}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold" style={{ color: '#2ECC71' }}>
+                            €{result.total_cost.toFixed(4)}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {result.response_time_ms}ms
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-4 text-xs text-muted-foreground mb-2">
+                        <span>In: {result.input_tokens} Tokens</span>
+                        <span>Out: {result.output_tokens} Tokens</span>
+                      </div>
+                      {result.response_text && (
+                        <div className="p-2 bg-muted rounded text-xs font-mono max-h-24 overflow-y-auto">
+                          {result.response_text}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
         )}
       </CardContent>
