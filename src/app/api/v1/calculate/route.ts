@@ -1,19 +1,26 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-});
+async function supabaseRequest(path: string, options: any = {}) {
+  const url = `${SUPABASE_URL}${path}`;
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+  
+  const data = await response.json();
+  return { data, error: response.ok ? null : data, status: response.status };
+}
 
-async function verifyApiKey(request: NextRequest) {
-  const authHeader = request.headers.get('Authorization');
+async function verifyApiKey(authHeader: string | null) {
   if (!authHeader?.startsWith('pk_')) {
     return { error: 'Invalid API key', status: 401 };
   }
@@ -21,38 +28,34 @@ async function verifyApiKey(request: NextRequest) {
   const key = authHeader.replace('Bearer ', '');
   const keyHash = crypto.createHash('sha256').update(key).digest('hex');
 
-  try {
-    const { data: apiKey, error } = await supabase
-      .from('api_keys')
-      .select('id, user_id, is_active, expires_at')
-      .eq('key_hash', keyHash)
-      .single();
+  const { data: apiKey, error } = await supabaseRequest(`/rest/v1/api_keys?key_hash=eq.${keyHash}&select=id,user_id,is_active,expires_at`);
 
-    if (error || !apiKey) {
-      return { error: 'Invalid API key', status: 401 };
-    }
-
-    if (!apiKey.is_active) {
-      return { error: 'API key is deactivated', status: 403 };
-    }
-
-    if (apiKey.expires_at && new Date(apiKey.expires_at) < new Date()) {
-      return { error: 'API key has expired', status: 403 };
-    }
-
-    return { userId: apiKey.user_id, keyId: apiKey.id };
-  } catch {
+  if (error || !apiKey || apiKey.length === 0) {
     return { error: 'Invalid API key', status: 401 };
   }
+
+  const keyData = apiKey[0];
+  
+  if (!keyData.is_active) {
+    return { error: 'API key is deactivated', status: 403 };
+  }
+
+  if (keyData.expires_at && new Date(keyData.expires_at) < new Date()) {
+    return { error: 'API key has expired', status: 403 };
+  }
+
+  return { userId: keyData.user_id, keyId: keyData.id };
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const auth = await verifyApiKey(request);
-    if (auth.error) {
-      return NextResponse.json({ error: auth.error }, { status: auth.status });
-    }
+  const authHeader = request.headers.get('Authorization');
+  const auth = await verifyApiKey(authHeader);
+  
+  if (auth.error) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
 
+  try {
     const body = await request.json();
     const { model, input_tokens, output_tokens, monthly_input, monthly_output } = body;
 
@@ -60,40 +63,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'model is required' }, { status: 400 });
     }
 
-    const { data, error } = await supabase
-      .from('current_prices')
-      .select('model_name, model_slug, provider_name, provider_slug, input_price_per_million, output_price_per_million, currency, context_window')
-      .eq('model_slug', model)
-      .single();
+    const { data, error } = await supabaseRequest(`/rest/v1/current_prices?model_slug=eq.${model}&select=model_name,model_slug,provider_name,provider_slug,input_price_per_million,output_price_per_million,currency,context_window`);
 
-    if (error || !data) {
+    if (error || !data || data.length === 0) {
       return NextResponse.json({ error: 'Model not found' }, { status: 404 });
     }
 
+    const modelData = data[0];
     const inputTokens = input_tokens || 0;
     const outputTokens = output_tokens || 0;
-    const inputCost = (inputTokens / 1000000) * data.input_price_per_million;
-    const outputCost = (outputTokens / 1000000) * data.output_price_per_million;
+    const inputCost = (inputTokens / 1000000) * modelData.input_price_per_million;
+    const outputCost = (outputTokens / 1000000) * modelData.output_price_per_million;
     const totalCost = inputCost + outputCost;
 
     const monthlyInput = monthly_input || 0;
     const monthlyOutput = monthly_output || 0;
-    const monthlyInputCost = (monthlyInput / 1000000) * data.input_price_per_million;
-    const monthlyOutputCost = (monthlyOutput / 1000000) * data.output_price_per_million;
+    const monthlyInputCost = (monthlyInput / 1000000) * modelData.input_price_per_million;
+    const monthlyOutputCost = (monthlyOutput / 1000000) * modelData.output_price_per_million;
     const totalMonthlyCost = monthlyInputCost + monthlyOutputCost;
     const yearlyCost = totalMonthlyCost * 12;
 
     return NextResponse.json({
       model: {
-        name: data.model_name,
-        slug: data.model_slug,
-        provider: data.provider_name,
+        name: modelData.model_name,
+        slug: modelData.model_slug,
+        provider: modelData.provider_name,
       },
       pricing: {
-        input_per_million: data.input_price_per_million,
-        output_per_million: data.output_price_per_million,
-        currency: data.currency,
-        context_window: data.context_window,
+        input_per_million: modelData.input_price_per_million,
+        output_per_million: modelData.output_price_per_million,
+        currency: modelData.currency,
+        context_window: modelData.context_window,
       },
       calculation: {
         one_time: {
