@@ -161,8 +161,11 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-6">
               {/* Preisvergleich */}
               <a href="#preisvergleich" className="group p-6 rounded-xl border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <BarChart3 className="w-6 h-6 text-primary" />
+                <div 
+                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                >
+                  <BarChart3 className="w-6 h-6" style={{ color: '#2ECC71' }} />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Preisvergleich</h3>
                 <p className="text-sm text-muted-foreground">Vergleiche Preise von über 300 AI-Modellen</p>
@@ -170,8 +173,11 @@ export default function Home() {
 
               {/* Kostenrechner */}
               <a href="#kostenrechner" className="group p-6 rounded-xl border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <DollarSign className="w-6 h-6 text-primary" />
+                <div 
+                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                >
+                  <DollarSign className="w-6 h-6" style={{ color: '#2ECC71' }} />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Kostenrechner</h3>
                 <p className="text-sm text-muted-foreground">Berechne die Kosten für deinen Use-Case</p>
@@ -179,8 +185,11 @@ export default function Home() {
 
               {/* Benchmark */}
               <a href="#benchmark" className="group p-6 rounded-xl border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Zap className="w-6 h-6 text-primary" />
+                <div 
+                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                >
+                  <Zap className="w-6 h-6" style={{ color: '#2ECC71' }} />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Benchmark</h3>
                 <p className="text-sm text-muted-foreground">Teste deine Prompts gegen alle Modelle</p>
