@@ -64,7 +64,7 @@ function getRestUrl(path) {
   return `${url}/rest/v1${path}`;
 }
 
-// HTTP helper
+// HTTP helper with DELETE support
 function httpRequest(path, method, body) {
   return new Promise((resolve, reject) => {
     const url = new URL(getRestUrl(path));
@@ -84,7 +84,7 @@ function httpRequest(path, method, body) {
       res.on('end', () => {
         if (res.statusCode >= 400) {
           reject(new Error(`HTTP ${res.statusCode}: ${data}`));
-        } else if (data.trim() && !path.includes('DELETE')) {
+        } else if (data.trim() && !path.includes('DELETE') && method !== 'DELETE') {
           resolve(JSON.parse(data));
         } else {
           resolve(null);
@@ -97,12 +97,107 @@ function httpRequest(path, method, body) {
   });
 }
 
-// Detect provider from model ID
-function detectProvider(modelId) {
-  const id = modelId.toLowerCase();
+// Delete price for today
+async function deleteTodaysPrice(modelId) {
+  const today = new Date().toISOString().split('T')[0];
+  return new Promise((resolve) => {
+    const url = new URL(getRestUrl(`/prices?model_id=eq.${modelId}&effective_date=eq.${today}`));
+    const req = https.request({
+      hostname: url.hostname,
+      port: 443,
+      path: url.pathname + url.search,
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => resolve());
+    });
+    req.on('error', () => resolve());
+    req.end();
+  });
+}
+
+// Detect provider from model ID (using OpenRouter's provider info when available)
+function detectProvider(model) {
+  const id = model.id.toLowerCase();
+  const name = model.name?.toLowerCase() || '';
+  
+  // Extract provider from OpenRouter model ID (format: provider/model-name)
+  const providerFromId = model.id.split('/')[0].toLowerCase();
+  
+  // Map OpenRouter providers to our provider names
+  const providerMap = {
+    'anthropic': 'Anthropic',
+    'openai': 'OpenAI',
+    'google': 'Google',
+    'mistral': 'Mistral AI',
+    'deepseek': 'DeepSeek',
+    'meta': 'Meta',
+    'groq': 'Groq',
+    'xai': 'xAI',
+    'cohere': 'Cohere',
+    'perplexity': 'Perplexity',
+    'aws': 'AWS Bedrock',
+    'bedrock': 'AWS Bedrock',
+    'amazon': 'AWS Bedrock',
+    'minimax': 'Minimax',
+    'moonshotai': 'MoonshotAI',
+    'moonshot': 'MoonshotAI',
+    'z-ai': 'Z-ai',
+    'zai': 'Z-ai',
+    'openrouter': 'OpenRouter',
+    'arcee-ai': 'Arcee AI',
+    'arcee': 'Arcee AI',
+    'upstage': 'Upstage',
+    'stepfun': 'StepFun',
+    'liquid': 'Liquid AI',
+    'allenai': 'AllenAI',
+    'olmo': 'AllenAI',
+    'writer': 'Writer',
+    'cogent': 'Cogent',
+    'cogentlabs': 'Cogent',
+    'neural': 'Neural',
+    'cerebras': 'Cerebras',
+    'nvidia': 'NVIDIA',
+    'baidu': 'Baidu',
+    'ernie': 'Baidu',
+    'bytedance': 'ByteDance',
+    'seed': 'ByteDance',
+    'qwen': 'OpenRouter',
+    'l3': 'OpenRouter',
+    'llama': 'OpenRouter',
+    'trinity': 'OpenRouter',
+    'nova': 'OpenRouter',
+    'bodybuilder': 'OpenRouter',
+    'intellect': 'OpenRouter',
+    'kat': 'OpenRouter',
+    'jamba': 'OpenRouter',
+    'mimo': 'OpenRouter',
+    'cydonia': 'OpenRouter',
+    'granite': 'OpenRouter',
+    'tongyi': 'OpenRouter',
+    'internvl': 'OpenRouter',
+    'ui-tars': 'OpenRouter',
+    'relace': 'OpenRouter',
+    'rnj': 'OpenRouter',
+    'auto': 'OpenRouter',
+    'router': 'OpenRouter',
+  };
+  
+  // Try to detect from ID first
+  if (providerMap[providerFromId]) {
+    return providerMap[providerFromId];
+  }
+  
+  // Fall back to pattern matching
   if (id.includes('gpt-') || id.includes('openai')) return 'OpenAI';
-  if (id.includes('claude') || id.includes('anthropic')) return 'Anthropic';
-  if (id.includes('gemini') || id.includes('google')) return 'Google';
+  if (id.includes('claude')) return 'Anthropic';
+  if (id.includes('gemini')) return 'Google';
   if (id.includes('mistral')) return 'Mistral AI';
   if (id.includes('deepseek')) return 'DeepSeek';
   if (id.includes('llama')) return 'Meta';
@@ -114,7 +209,14 @@ function detectProvider(modelId) {
   if (id.includes('minimax')) return 'Minimax';
   if (id.includes('moonshot')) return 'MoonshotAI';
   if (id.includes('z-ai') || id.includes('glm')) return 'Z-ai';
-  return 'OpenRouter';
+  if (id.includes('arcee')) return 'Arcee AI';
+  if (id.includes('upstage')) return 'Upstage';
+  if (id.includes('stepfun')) return 'StepFun';
+  if (id.includes('liquid')) return 'Liquid AI';
+  if (id.includes('allenai') || id.includes('olmo')) return 'AllenAI';
+  if (id.includes('writer')) return 'Writer';
+  
+  return 'OpenRouter'; // Default
 }
 
 // Generate slug from OpenRouter model
@@ -187,8 +289,9 @@ async function sync() {
     
     // Find models to delete (in DB but not in OpenRouter)
     const modelsToDelete = existingModels.filter(m => {
-      const slug = m.slug.toLowerCase();
-      return !openrouterLookup[slug] && !openrouterLookup[m.id?.toLowerCase()];
+      const slug = String(m.slug || '').toLowerCase();
+      const modelId = String(m.id || '').toLowerCase();
+      return !openrouterLookup[slug] && !openrouterLookup[modelId];
     });
     
     console.log(`🗑️ Models to delete: ${modelsToDelete.length}`);
@@ -203,27 +306,39 @@ async function sync() {
     
     // Process OpenRouter models
     let newModels = 0, updatedPrices = 0, skipped = 0;
+    let sortOrder = 1;
     
     for (const model of openrouterModels) {
       const id = model.id;
       const name = id.split('/').pop() || id;
       const slug = generateSlug(model);
-      const providerName = detectProvider(id);
+      const providerName = detectProvider(model);
       const providerSlug = providerName.toLowerCase().replace(/[^a-z0-9]/g, '-');
       
       let providerId = providerMap[providerSlug]?.id || providerMap[providerName.toLowerCase()]?.id;
       
       if (!providerId) {
-        // Create provider
-        const result = await httpRequest('/providers', 'POST', {
-          name: providerName,
-          slug: providerSlug,
-          is_active: true,
-          sort_order: 99
-        });
-        providerId = result?.[0]?.id || result?.id;
-        providerMap[providerSlug] = { id: providerId, slug: providerSlug, name: providerName };
-        console.log(`🆕 New provider: ${providerName}`);
+        // Check if provider exists
+        const existingProvider = Object.values(providerMap).find(p => 
+          p.name.toLowerCase() === providerName.toLowerCase() || 
+          p.slug.toLowerCase() === providerSlug
+        );
+        
+        if (existingProvider) {
+          providerId = existingProvider.id;
+          providerMap[providerSlug] = existingProvider;
+        } else {
+          // Create provider
+          const result = await httpRequest('/providers', 'POST', {
+            name: providerName,
+            slug: providerSlug,
+            is_active: true,
+            sort_order: 99
+          });
+          providerId = result?.[0]?.id || result?.id;
+          providerMap[providerSlug] = { id: providerId, slug: providerSlug, name: providerName };
+          console.log(`🆕 New provider: ${providerName}`);
+        }
       }
       
       const modelExists = modelSlugs.has(slug);
@@ -238,18 +353,19 @@ async function sync() {
           max_output_tokens: model.max_completion_tokens || model.max_tokens || 4096,
           capabilities: extractCapabilities(model),
           is_active: true,
-          sort_order: 99
+          sort_order: sortOrder
         };
         
         const result = await httpRequest('/models', 'POST', modelData);
         const modelId = result?.[0]?.id || result?.id;
         modelSlugs.add(slug);
         
-        // Insert price
+        // Insert price (delete existing first if needed)
         const pricing = model.pricing || {};
         const inputPrice = (parseFloat(pricing.prompt || 0)) * 1000000 * exchangeRate;
         const outputPrice = (parseFloat(pricing.completion || 0)) * 1000000 * exchangeRate;
         
+        await deleteTodaysPrice(modelId);
         await httpRequest('/prices', 'POST', {
           model_id: modelId,
           input_price_per_million: Math.round(inputPrice * 10000) / 10000,
@@ -274,7 +390,8 @@ async function sync() {
           const oldOutput = parseFloat(latestPrices[modelId].output_price_per_million || 0);
           
           if (Math.abs(oldInput - inputPrice) > 0.0001 || Math.abs(oldOutput - outputPrice) > 0.0001) {
-            // Insert new price
+            // Insert new price (delete existing first if needed)
+            await deleteTodaysPrice(modelId);
             await httpRequest('/prices', 'POST', {
               model_id: modelId,
               input_price_per_million: Math.round(inputPrice * 10000) / 10000,
@@ -288,6 +405,7 @@ async function sync() {
           }
         }
       }
+      sortOrder++;
     }
     
     console.log('\n✅ Sync complete!');
