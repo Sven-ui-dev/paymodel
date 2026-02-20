@@ -28,7 +28,6 @@ export const providerLogos: Record<string, string> = {
   'baidu': 'https://upload.wikimedia.org/wikipedia/commons/0/09/Baidu_%28website%29_logo.svg',
   'bytedance': 'https://upload.wikimedia.org/wikipedia/commons/6/67/ByteDance_logo.svg',
   'cerebras': 'https://cerebras.ai/favicon.ico',
-  'cohere': 'https://cohere.ai/favicon.ico',
   'kat': 'https://kat.academy/favicon.ico',
   'kat-ml': 'https://kat.academy/favicon.ico',
   'jamba': 'https://ai21.com/favicon.ico',
