@@ -12,9 +12,17 @@ const https = require('https');
 // OpenRouter API - models endpoint (public, no auth needed)
 const OPENROUTER_API = 'https://openrouter.ai/api/v1/models';
 
-// Supabase connection
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+// Supabase connection - support both local (.env) and GitHub Actions (secrets)
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+// Validate credentials
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.error('❌ Missing Supabase credentials');
+  console.error('   SUPABASE_URL:', SUPABASE_URL ? '✓' : '✗');
+  console.error('   SUPABASE_KEY:', SUPABASE_KEY ? '✓' : '✗');
+  process.exit(1);
+}
 
 // Exchange rate
 let exchangeRate = 0.85;
