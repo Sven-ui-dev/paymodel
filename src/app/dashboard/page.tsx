@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Navbar } from "@/components/ui-extended/Navbar";
+import { PriceAlertsList } from "@/components/PriceAlertsList";
 import {
   Loader2,
   CreditCard,
@@ -504,6 +505,9 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Price Alerts Section */}
+        {user && <PriceAlertsList userId={user.id} />}
 
         {/* Info Cards Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
