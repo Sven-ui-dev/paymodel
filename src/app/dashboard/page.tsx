@@ -75,23 +75,23 @@ interface PlanFeature {
 
 const planFeatures: Record<PlanType, PlanFeature[]> = {
   free: [
-    { name: "Preisvergleich", icon: BarChart3 },
-    { name: "Kostenrechner", icon: TrendingUp },
+    { name: "Preisvergleich", icon: BarChart3, included: true },
+    { name: "Kostenrechner", icon: TrendingUp, included: true },
     { name: "5 Modell-Vergleiche/Tag", icon: Zap, included: false },
   ],
   pro: [
     { name: "Alles aus Free", icon: CheckCircle, included: true },
-    { name: "Unbegrenzter Preisvergleich", icon: Zap },
-    { name: "Echtzeit-Preise", icon: Clock },
-    { name: "Preis-Benachrichtigungen", icon: Bell },
-    { name: "Export-Funktionen", icon: Settings },
+    { name: "Unbegrenzter Preisvergleich", icon: Zap, included: true },
+    { name: "Echtzeit-Preise", icon: Clock, included: true },
+    { name: "Preis-Benachrichtigungen", icon: Bell, included: true },
+    { name: "Export-Funktionen", icon: Settings, included: true },
   ],
   business: [
     { name: "Alles aus Pro", icon: CheckCircle, included: true },
-    { name: "API-Zugang", icon: Zap },
-    { name: "Team-Funktionen", icon: User },
-    { name: "Prioritäts-Support", icon: Shield },
-    { name: "Custom Integrations", icon: Settings },
+    { name: "API-Zugang", icon: Zap, included: true },
+    { name: "Team-Funktionen", icon: User, included: true },
+    { name: "Prioritäts-Support", icon: Shield, included: true },
+    { name: "Custom Integrations", icon: Settings, included: true },
   ],
 };
 
