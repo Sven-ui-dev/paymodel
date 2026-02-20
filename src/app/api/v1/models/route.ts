@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-// Create a simple client without SSR
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET(request: NextRequest) {
@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
   }
 
   const key = authHeader.replace('Bearer ', '');
-  const crypto = require('crypto');
   const keyHash = crypto.createHash('sha256').update(key).digest('hex');
 
   try {
