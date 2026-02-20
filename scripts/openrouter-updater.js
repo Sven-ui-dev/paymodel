@@ -249,7 +249,37 @@ async function upsertModel(providerId, name, slug, contextWindow, maxTokens, cap
   }
 }
 
+async function deleteTodaysPrices(modelId) {
+  const today = new Date().toISOString().split('T')[0];
+  return new Promise((resolve, reject) => {
+    const url = new URL(SUPABASE_URL.replace(/\/+$/, '').replace(/\/rest\/v1$/, '') + '/rest/v1/prices');
+    url.searchParams.append('model_id', 'eq.' + modelId);
+    url.searchParams.append('effective_date', 'eq.' + today);
+    
+    const req = https.request({
+      hostname: url.hostname,
+      port: 443,
+      path: url.pathname + url.search,
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => resolve());
+    });
+    req.on('error', reject);
+    req.end();
+  });
+}
+
 async function insertPrice(modelId, inputPriceEur, outputPriceEur) {
+  // Delete existing price for today first (handle duplicate key)
+  await deleteTodaysPrices(modelId);
+  
   await supabasePost('/prices', {
     model_id: modelId,
     input_price_per_million: Math.round(inputPriceEur * 10000) / 10000,
