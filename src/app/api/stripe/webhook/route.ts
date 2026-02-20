@@ -16,13 +16,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
-// Simple Supabase client for server-side operations
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+// Lazy Supabase client
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 async function sendWelcomeEmail(email: string, planName: string) {
   try {
@@ -241,7 +243,7 @@ export async function POST(request: Request) {
             .eq('id', profiles.id);
 
           const periodStart = (subscription as any).current_period_start || subscription.billing_cycle_anchor;
-          await supabase.from('subscription_history').insert({
+          await getSupabaseAdmin().from('subscription_history').insert({
             user_id: profiles.id,
             stripe_subscription_id: subscription.id,
             plan: subscription.metadata?.planName || 'pro',

@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Service Role Client für Admin-Operationen
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(request: Request) {
   try {
     // Verify user is authenticated
@@ -31,6 +25,12 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
+
+    // Service Role Client für Admin-Operationen (lazy init)
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
     // Delete profile from database first
     const { error: profileError } = await supabaseAdmin
