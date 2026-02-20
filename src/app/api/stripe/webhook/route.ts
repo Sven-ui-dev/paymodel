@@ -167,14 +167,14 @@ export async function POST(request: Request) {
         const planName = session.metadata?.planName || 'pro';
 
         if (email) {
-          const { data: profiles } = await supabase
+          const { data: profiles } = await getSupabaseAdmin()
             .from('profiles')
             .select('id')
             .eq('email', email)
             .single();
 
           if (profiles) {
-            await supabase
+            await getSupabaseAdmin()
               .from('profiles')
               .update({
                 stripe_customer_id: customerId,
@@ -221,7 +221,7 @@ export async function POST(request: Request) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         
-        const { data: profiles } = await supabase
+        const { data: profiles } = await getSupabaseAdmin()
           .from('profiles')
           .select('id, email')
           .eq('stripe_customer_id', customerId)
@@ -232,7 +232,7 @@ export async function POST(request: Request) {
           const periodEnd = (subscription as any).current_period_end || subscription.billing_cycle_anchor;
           const previousAttributes = event.data.previous_attributes as any;
           
-          await supabase
+          await getSupabaseAdmin()
             .from('profiles')
             .update({
               subscription_status: status,
@@ -282,14 +282,14 @@ export async function POST(request: Request) {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
         
-        const { data: profiles } = await supabase
+        const { data: profiles } = await getSupabaseAdmin()
           .from('profiles')
           .select('id, email')
           .eq('stripe_customer_id', customerId)
           .single();
 
         if (profiles) {
-          await supabase
+          await getSupabaseAdmin()
             .from('profiles')
             .update({
               subscription_status: 'past_due',
