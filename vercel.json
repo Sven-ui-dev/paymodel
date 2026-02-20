@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/alerts/cron/check",
+      "path": "/api/cron/sync",
       "schedule": "0 9 * * *"
     }
   ]
