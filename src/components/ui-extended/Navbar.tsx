@@ -44,6 +44,12 @@ export function Navbar({ user }: NavbarProps) {
             >
               Features
             </Link>
+            <Link 
+              href="/api-docs" 
+              className="text-sm font-medium hover:text-primary transition-colors"
+            >
+              API Doku
+            </Link>
             {user && (
               <Link 
                 href="/dashboard" 
@@ -100,6 +106,13 @@ export function Navbar({ user }: NavbarProps) {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
+              </Link>
+              <Link 
+                href="/api-docs" 
+                className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                API Doku
               </Link>
               {user ? (
                 <Link 
