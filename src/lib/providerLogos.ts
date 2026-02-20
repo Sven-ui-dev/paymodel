@@ -1,68 +1,58 @@
-// Provider Logos - using inline SVGs for reliable display
-
-// Generate SVG data URI for a provider - larger for mobile
-function createProviderSVG(name: string, color: string): string {
-  // Create larger SVG with proper viewBox
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50"><rect width="200" height="50" rx="8" fill="${color}"/><text x="12" y="32" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="white">${name}</text></svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-}
+// Provider Logos - Official URLs
 
 export const providerLogos: Record<string, string> = {
-  // Major AI Providers - using brand colors
-  'openai': createProviderSVG('OpenAI', '#10A37F'),
-  'anthropic': createProviderSVG('Anthropic', '#D97757'),
-  'anthropic-claude': createProviderSVG('Claude', '#D97757'),
-  'google': createProviderSVG('Google', '#4285F4'),
-  'google-gemini': createProviderSVG('Gemini', '#4285F4'),
-  'mistral': createProviderSVG('Mistral', '#FF7000'),
-  'deepseek': createProviderSVG('DeepSeek', '#202020'),
-  'groq': createProviderSVG('Groq', '#FF4B4B'),
-  'xai': createProviderSVG('xAI', '#000000'),
-  'meta': createProviderSVG('Meta', '#0668E1'),
-  'meta-llama': createProviderSVG('Llama', '#0668E1'),
-  'cohere': createProviderSVG('Cohere', '#000000'),
-  'perplexity': createProviderSVG('Perplexity', '#6366F1'),
+  // Major AI Providers - Official logo URLs
+  'openai': 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg',
+  'anthropic': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_Logo.svg',
+  'anthropic-claude': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_Logo.svg',
+  'google': 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg',
+  'google-gemini': 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg',
+  'mistral': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Mistral_Logo.svg',
+  'deepseek': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/DeepSeek_Logo.svg/200px-DeepSeek_Logo.svg.png',
+  'groq': 'https://groq.com/wp-content/uploads/2024/02/groq-logo.svg',
+  'xai': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Logo_of_X.svg/200px-Logo_of_X.svg.png',
+  'meta': 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg',
+  'meta-llama': 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg',
+  'cohere': 'https://docs.cohere.com/docs/images/cohere-logo.svg',
+  'perplexity': 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Perplexity_AI_logo.svg',
   
   // Cloud providers
-  'aws-bedrock': createProviderSVG('AWS', '#FF9900'),
-  'aws': createProviderSVG('AWS', '#FF9900'),
-  'azure': createProviderSVG('Azure', '#0078D4'),
+  'aws-bedrock': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg',
+  'aws': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg',
+  'azure': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Azure_logo.svg',
   
-  // Chinese providers
-  'minimax': createProviderSVG('Minimax', '#6B4EFF'),
-  'z-ai': createProviderSVG('Z-ai', '#6B4EFF'),
-  'moonshotai': createProviderSVG('Moonshot', '#000000'),
-  'stepfun': createProviderSVG('StepFun', '#000000'),
-  'baidu': createProviderSVG('Baidu', '#2932E1'),
-  'bytedance': createProviderSVG('ByteDance', '#3DDC84'),
-  'tongyi': createProviderSVG('Tongyi', '#2932E1'),
-  'qwen': createProviderSVG('Qwen', '#2932E1'),
+  // Chinese providers - using brand colors as fallback
+  'minimax': 'https://minimax.io/favicon.ico',
+  'z-ai': 'https://z-ai.cn/favicon.ico',
+  'moonshotai': 'https://platform.moonshot.cn/favicon.ico',
+  'stepfun': 'https://stepfun.com/favicon.ico',
+  'baidu': 'https://upload.wikimedia.org/wikipedia/commons/0/09/Baidu_%28website%29_logo.svg',
+  'bytedance': 'https://upload.wikimedia.org/wikipedia/commons/6/67/ByteDance_logo.svg',
+  'tongyi': 'https://upload.wikimedia.org/wikipedia/commons/0/09/Baidu_%28website%29_logo.svg',
+  'qwen': 'https://upload.wikimedia.org/wikipedia/commons/0/09/Baidu_%28website%29_logo.svg',
   
   // Other providers
-  'arcee-ai': createProviderSVG('Arcee', '#6B4EFF'),
-  'arcee': createProviderSVG('Arcee', '#6B4EFF'),
-  'upstage': createProviderSVG('Upstage', '#000000'),
-  'writer': createProviderSVG('Writer', '#000000'),
-  'liquid-ai': createProviderSVG('Liquid', '#000000'),
-  'liquid': createProviderSVG('Liquid', '#000000'),
-  'allenai': createProviderSVG('AllenAI', '#000000'),
-  'olmo': createProviderSVG('OLMo', '#000000'),
-  'cerebras': createProviderSVG('Cerebras', '#000000'),
-  'nvidia': createProviderSVG('NVIDIA', '#76B900'),
-  'fireworks': createProviderSVG('Fireworks', '#000000'),
-  'anyscale': createProviderSVG('Anyscale', '#000000'),
-  'together': createProviderSVG('Together', '#000000'),
-  'replicate': createProviderSVG('Replicate', '#000000'),
-  'lepton': createProviderSVG('Lepton', '#000000'),
-  'openrouter': createProviderSVG('OpenRouter', '#000000'),
-  'novita': createProviderSVG('Novita', '#000000'),
-  'hyperbolic': createProviderSVG('Hyperbolic', '#000000'),
-  'deepinfra': createProviderSVG('DeepInfra', '#000000'),
-  'sambanova': createProviderSVG('SambaNova', '#000000'),
+  'arcee-ai': 'https://arcee.ai/wp-content/uploads/2024/05/arcee-ai-logo.svg',
+  'arcee': 'https://arcee.ai/wp-content/uploads/2024/05/arcee-ai-logo.svg',
+  'upstage': 'https://www.upstage.ai/wp-content/uploads/2024/03/upstage-logo.svg',
+  'writer': 'https://writer.com/wp-content/uploads/2023/10/writer-logo-dark.svg',
+  'liquid-ai': 'https://liquid.ai/wp-content/uploads/2024/01/liquid-logo.svg',
+  'liquid': 'https://liquid.ai/wp-content/uploads/2024/01/liquid-logo.svg',
+  'allenai': 'https://allenai.org/olmo/assets/img/ai2-logo-full.svg',
+  'olmo': 'https://allenai.org/olmo/assets/img/ai2-logo-full.svg',
+  'cerebras': 'https://cerebras.net/wp-content/uploads/2023/09/cerebras_logo.svg',
+  'nvidia': 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Nvidia_logo.svg',
+  'fireworks': 'https://fireworks.ai/assets/images/logo.svg',
+  'anyscale': 'https://docs.anyscale.com/assets/logo-full.png',
+  'together': 'https://together.ai/together-logo.svg',
+  'replicate': 'https://replicate.com/replicate-logo.svg',
+  'lepton': 'https://lepton.ai/assets/logo.svg',
+  'openrouter': 'https://openrouter.ai/favicon.ico',
+  'novita': 'https://novita.ai/favicon.ico',
+  'hyperbolic': 'https://hyperbolic.ai/hyperbolic-logo.svg',
+  'deepinfra': 'https://deepinfra.com/static/logo.svg',
+  'sambanova': 'https://sambanova.ai/hubfs/sambanova-logo.svg',
 };
-
-// Export as plain object for runtime
-export const providerLogosPlain: Record<string, string> = providerLogos;
 
 export function getProviderLogo(providerSlug: string): string | null {
   // Try exact match
@@ -87,7 +77,28 @@ export function getProviderLogo(providerSlug: string): string | null {
 }
 
 export function getProviderColor(providerSlug: string): string {
-  // Return null to indicate we should use the logo
-  // The color is embedded in the SVG
-  return 'transparent';
+  // Brand colors for fallback
+  const colors: Record<string, string> = {
+    'openai': '#10A37F',
+    'anthropic': '#D97757',
+    'google': '#4285F4',
+    'mistral': '#FF7000',
+    'deepseek': '#202020',
+    'groq': '#FF4B4B',
+    'xai': '#000000',
+    'meta': '#0668E1',
+    'cohere': '#000000',
+    'perplexity': '#6366F1',
+    'aws': '#FF9900',
+    'azure': '#0078D4',
+    'minimax': '#6B4EFF',
+    'nvidia': '#76B900',
+    'baidu': '#2932E1',
+    'bytedance': '#3DDC84',
+  };
+  
+  if (colors[providerSlug]) return colors[providerSlug];
+  
+  const baseSlug = providerSlug.split('-')[0];
+  return colors[baseSlug] || '#2ECC71';
 }
