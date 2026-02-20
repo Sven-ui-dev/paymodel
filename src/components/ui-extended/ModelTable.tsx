@@ -15,7 +15,7 @@ interface ModelTableProps {
 }
 
 export function ModelTable({ models, favorites, onFavorite, compact = false }: ModelTableProps) {
-  const [sortField, setSortField] = useState<keyof CurrentPrice>("input_price_per_million");
+  const [sortField, setSortField] = useState<keyof CurrentPrice>("sort_order");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const handleSort = (field: keyof CurrentPrice) => {
