@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { Navbar } from "@/components/ui-extended/Navbar";
 import {
   Loader2,
   CreditCard,
@@ -24,7 +24,6 @@ import {
   ChevronRight,
   Settings,
   Bell,
-  FileText,
   User,
   Sparkles,
   Clock,
@@ -213,10 +212,10 @@ export default function DashboardPage() {
               <div className="w-full h-full rounded-full border-4 border-primary border-t-transparent" />
             </div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+              <Sparkles className="w-6 h-6 text-primary" />
             </div>
           </div>
-          <p className="text-muted-foreground animate-pulse">Dashboard wird geladen...</p>
+          <p className="text-muted-foreground">Dashboard wird geladen...</p>
         </div>
       </div>
     );
@@ -256,53 +255,24 @@ export default function DashboardPage() {
   const currentPlan: PlanType = (profile?.subscription_plan as PlanType) || "free";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center transition-transform group-hover:scale-105">
-                <Sparkles className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-lg tracking-tight">paymodel.ai</span>
-            </Link>
-
-            <div className="flex items-center gap-2">
-              <Link href="/pricing">
-                <Button variant="ghost" size="sm" className="hidden sm:flex">
-                  Preise
-                </Button>
-              </Link>
-              <Separator orientation="vertical" className="h-6 hidden sm:block" />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Logout</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navbar user={user} />
 
       <main className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Welcome Section */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight mb-1">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-1">
                 Willkommen zurück 👋
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Hier ist dein aktueller Abo-Status und deine Übersicht
               </p>
             </div>
-            <Avatar className="w-12 h-12 bg-primary/10 ring-2 ring-primary/20">
-              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+            <Avatar className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 ring-2 ring-primary/20">
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm sm:text-base">
                 {profile?.email ? getInitials(profile.email) : "U"}
               </AvatarFallback>
             </Avatar>
@@ -310,21 +280,21 @@ export default function DashboardPage() {
         </div>
 
         {/* Subscription Overview Cards */}
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           {/* Main Plan Card */}
-          <Card className={`md:col-span-2 border-2 ${planColors[currentPlan].border} overflow-hidden`}>
+          <Card className={`sm:col-span-2 border-2 ${planColors[currentPlan].border} overflow-hidden`}>
             <div className={`h-1 bg-gradient-to-r ${planColors[currentPlan].gradient}`} />
-            <CardContent className="pt-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl ${planColors[currentPlan].bg} flex items-center justify-center`}>
-                    <Crown className={`w-6 h-6 ${planColors[currentPlan].text}`} />
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${planColors[currentPlan].bg} flex items-center justify-center shrink-0`}>
+                    <Crown className={`w-5 h-5 sm:w-6 sm:h-6 ${planColors[currentPlan].text}`} />
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Aktueller Plan</p>
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Aktueller Plan</p>
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
                       <Badge
-                        className={`${
+                        className={`text-xs sm:text-sm ${
                           currentPlan === "free"
                             ? "bg-muted text-muted-foreground"
                             : currentPlan === "pro"
@@ -336,19 +306,19 @@ export default function DashboardPage() {
                         {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
                       </Badge>
                       {currentPlan !== "free" && (
-                        <span className="text-lg font-semibold">
+                        <span className="text-sm sm:text-lg font-semibold">
                           €{planPrices[currentPlan]}/Monat
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
                       {profile?.subscription_status === "active" ? (
-                        <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
+                        <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20 text-xs">
                           <CheckCircle className="w-3 h-3 mr-1" />
                           Aktiv
                         </Badge>
                       ) : (
-                        <Badge variant="secondary">
+                        <Badge variant="secondary" className="text-xs">
                           <AlertCircle className="w-3 h-3 mr-1" />
                           Inaktiv
                         </Badge>
@@ -358,28 +328,28 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Quick Stats */}
-                <div className="flex gap-6 px-4 py-3 bg-muted/50 rounded-lg">
+                <div className="flex gap-4 sm:gap-6 p-3 sm:p-4 bg-muted/50 rounded-lg">
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{modelsAfforded(currentPlan)}</p>
-                    <p className="text-xs text-muted-foreground">Modelle verfügbar</p>
+                    <p className="text-xl sm:text-2xl font-bold">{modelsAfforded(currentPlan)}</p>
+                    <p className="text-xs text-muted-foreground">Modelle</p>
                   </div>
-                  <Separator orientation="vertical" className="h-10" />
+                  <Separator orientation="vertical" className="h-10 hidden sm:block" />
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-green-600">
+                    <p className="text-xl sm:text-2xl font-bold text-green-600">
                       {currentPlan === "free" ? "0%" : currentPlan === "pro" ? "40%" : "60%"}
                     </p>
-                    <p className="text-xs text-muted-foreground">Einsparpotenzial</p>
+                    <p className="text-xs text-muted-foreground">Einsparung</p>
                   </div>
                 </div>
               </div>
 
               {/* Renewal Date */}
               {(currentPlan === "pro" || currentPlan === "business") && profile?.current_period_end && (
-                <div className="mt-6 flex items-center gap-3 p-4 bg-muted/50 rounded-lg border border-dashed">
-                  <Calendar className="w-5 h-5 text-muted-foreground shrink-0" />
+                <div className="mt-4 flex items-center gap-3 p-3 bg-muted/50 rounded-lg border border-dashed">
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground shrink-0" />
                   <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Nächste Abrechnung</p>
-                    <p className="font-medium">{formatDate(profile.current_period_end)}</p>
+                    <p className="text-xs text-muted-foreground">Nächste Abrechnung</p>
+                    <p className="font-medium text-sm">{formatDate(profile.current_period_end)}</p>
                   </div>
                   <RefreshCw className="w-4 h-4 text-muted-foreground" />
                 </div>
@@ -389,7 +359,7 @@ export default function DashboardPage() {
 
           {/* Quick Actions Card */}
           <Card className="border-dashed">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 sm:pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Zap className="w-4 h-4 text-amber-500" />
                 Schnellaktionen
@@ -399,7 +369,7 @@ export default function DashboardPage() {
               {profile?.subscription_status === "active" ? (
                 <Button
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-xs sm:text-sm"
                   onClick={handleManageSubscription}
                   disabled={manageLoading}
                 >
@@ -408,10 +378,10 @@ export default function DashboardPage() {
                   ) : (
                     <CreditCard className="w-4 h-4 mr-2" />
                   )}
-                  Subscription verwalten
+                  Subscription
                 </Button>
               ) : (
-                <Button className="w-full" onClick={() => router.push("/pricing")}>
+                <Button className="w-full text-xs sm:text-sm" onClick={() => router.push("/pricing")}>
                   <Crown className="w-4 h-4 mr-2" />
                   Jetzt upgraden
                 </Button>
@@ -419,7 +389,7 @@ export default function DashboardPage() {
 
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start text-xs sm:text-sm"
                 onClick={() => router.push("/#kostenrechner")}
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
@@ -427,8 +397,8 @@ export default function DashboardPage() {
               </Button>
 
               <Link href="/pricing" className="block">
-                <Button variant="ghost" className="w-full justify-between">
-                  Alle Pläne ansehen
+                <Button variant="ghost" className="w-full justify-between text-xs sm:text-sm">
+                  Alle Pläne
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -439,25 +409,24 @@ export default function DashboardPage() {
         {/* Features Comparison */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <Shield className="w-5 h-5 text-primary" />
               Deine Plan-Features
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Übersicht der in deinem Plan enthaltenen Funktionen
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 gap-3">
               {planFeatures[currentPlan].map((feature, index) => (
                 <div
                   key={feature.name}
-                  className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 hover:scale-[1.02] ${
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
                     feature.included
                       ? "bg-primary/5"
                       : "bg-muted/50"
                   }`}
-                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
@@ -472,7 +441,7 @@ export default function DashboardPage() {
                       <feature.icon className="w-4 h-4" />
                     )}
                   </div>
-                  <span className={feature.included ? "font-medium" : "text-muted-foreground"}>
+                  <span className={`text-sm ${feature.included ? "font-medium" : "text-muted-foreground"}`}>
                     {feature.name}
                   </span>
                 </div>
@@ -484,35 +453,34 @@ export default function DashboardPage() {
         {/* Upgrade CTA for Free Users */}
         {currentPlan === "free" && (
           <Card className="mb-8 bg-gradient-to-r from-primary/10 via-primary/5 to-background border-primary/20">
-            <CardContent className="pt-6">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0 animate-pulse">
-                    <Crown className="w-7 h-7 text-white" />
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
+                    <Crown className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-1">Upgrade zu Pro</h3>
-                    <p className="text-muted-foreground mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg sm:text-xl font-bold mb-1">Upgrade zu Pro</h3>
+                    <p className="text-muted-foreground text-sm mb-3">
                       Erhalte erweiterte Features, Echtzeit-Preise und Premium-Support
                     </p>
-                    <div className="flex flex-wrap gap-3">
-                      <Badge variant="outline" className="bg-background">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className="bg-background text-xs">
                         ✓ Echtzeit-Preise
                       </Badge>
-                      <Badge variant="outline" className="bg-background">
+                      <Badge variant="outline" className="bg-background text-xs">
                         ✓ Preis-Benachrichtigungen
                       </Badge>
-                      <Badge variant="outline" className="bg-background">
+                      <Badge variant="outline" className="bg-background text-xs">
                         ✓ Export-Funktionen
                       </Badge>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
                   <Button
-                    size="lg"
-                    className="flex-1 sm:flex-none bg-blue-500 hover:bg-blue-600"
+                    className="flex-1 sm:flex-none bg-blue-500 hover:bg-blue-600 text-sm"
                     onClick={() => handleUpgrade("price_1T2UBVAwdEweUSNveqIRiSE2", "pro")}
                     disabled={manageLoading}
                   >
@@ -521,16 +489,15 @@ export default function DashboardPage() {
                     ) : (
                       <Crown className="w-4 h-4 mr-2" />
                     )}
-                    Pro für €19/Monat
+                    Pro €19/Monat
                   </Button>
                   <Button
-                    size="lg"
                     variant="outline"
-                    className="flex-1 sm:flex-none"
+                    className="flex-1 sm:flex-none text-sm"
                     onClick={() => handleUpgrade("price_1T2UFEAwdEweUSNvkKOoPJSQ", "business")}
                     disabled={manageLoading}
                   >
-                    Business für €29/Monat
+                    Business €29/Monat
                   </Button>
                 </div>
               </div>
@@ -539,54 +506,54 @@ export default function DashboardPage() {
         )}
 
         {/* Info Cards Grid */}
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Card className="group hover:border-primary/30 transition-colors cursor-pointer" onClick={() => router.push("/")}>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                  <BarChart3 className="w-6 h-6 text-blue-600" />
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors shrink-0">
+                  <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold mb-1">Preise vergleichen</h3>
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm sm:text-base mb-0.5">Preise vergleichen</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                     Alle AI-Modelle im direkten Vergleich
                   </p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="group hover:border-primary/30 transition-colors cursor-pointer" onClick={() => router.push("/dashboard/stats")}>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                  <PieChart className="w-6 h-6 text-purple-600" />
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors shrink-0">
+                  <PieChart className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold mb-1">Nutzungs-Statistiken</h3>
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm sm:text-base mb-0.5">Nutzungs-Statistiken</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                     Deine Aktivität und Einsparungen
                   </p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="group hover:border-primary/30 transition-colors cursor-pointer" onClick={() => router.push("/#kostenrechner")}>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors shrink-0">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold mb-1">Kostenrechner</h3>
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm sm:text-base mb-0.5">Kostenrechner</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">
                     Berechne deine monatlichen Kosten
                   </p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
               </div>
             </CardContent>
           </Card>
@@ -594,10 +561,10 @@ export default function DashboardPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t mt-12 py-6">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+      <footer className="border-t mt-8 sm:mt-12 py-6">
+        <div className="container mx-auto px-4 text-center text-xs sm:text-sm text-muted-foreground">
           <p>© 2026 paymodel.ai – Alle Rechte vorbehalten.</p>
-          <div className="flex justify-center gap-4 mt-2">
+          <div className="flex justify-center gap-3 sm:gap-4 mt-2">
             <Link href="/impressum" className="hover:text-foreground transition-colors">
               Impressum
             </Link>
