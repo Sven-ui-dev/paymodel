@@ -146,14 +146,22 @@ function extractPricing(pricing) {
   return { input: inputPrice, output: outputPrice };
 }
 
-// Generate short slug from model ID
-function generateSlug(modelId) {
-  const name = modelId.split('/').pop() || modelId;
+// Generate short slug from model ID (use canonical_slug if available)
+function generateSlug(model) {
+  // Prefer OpenRouter's canonical_slug for consistency
+  if (model.canonical_slug) {
+    const slug = model.canonical_slug.toLowerCase()
+      .replace(/[^a-z0-9-/]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/-+$/, '');
+    return slug.split('/').pop()?.substring(0, 50).replace(/-+$/, '') || slug;
+  }
+  
+  const name = model.id.split('/').pop() || model.id;
   const slug = name.toLowerCase()
     .replace(/[^a-z0-9-]/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
-  // Truncate to 50 chars and remove trailing dashes
   return slug.substring(0, 50).replace(/-+$/, '');
 }
 
@@ -280,8 +288,8 @@ async function updatePrices() {
     for (const model of openrouterModels) {
       const id = model.id;
       const name = id.split('/').pop() || id;
-      // Create clean slug from model ID (max 50 chars)
-      const slug = generateSlug(id);
+      // Use canonical_slug for consistent model identification
+      const slug = generateSlug(model);
       
       const capabilities = model.capabilities || [];
       const modalities = model.architecture?.input_modalities || [];
