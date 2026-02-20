@@ -270,6 +270,41 @@ export default function DashboardPage() {
       <Navbar user={user} />
 
       <main className="container mx-auto px-4 py-8 max-w-5xl">
+        {/* Feature Cards */}
+        <div className="grid md:grid-cols-4 gap-4 mb-8">
+          <a href="#preisvergleich" className="group p-4 rounded-xl border bg-card hover:border-primary/50 transition-all">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <BarChart3 className="w-5 h-5 text-primary" />
+            </div>
+            <h3 className="font-semibold text-sm">Preisvergleich</h3>
+            <p className="text-xs text-muted-foreground">Alle Modelle</p>
+          </a>
+
+          <a href="#kostenrechner" className="group p-4 rounded-xl border bg-card hover:border-primary/50 transition-all">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <DollarSign className="w-5 h-5 text-primary" />
+            </div>
+            <h3 className="font-semibold text-sm">Kostenrechner</h3>
+            <p className="text-xs text-muted-foreground">Preise berechnen</p>
+          </a>
+
+          <a href="#benchmark" className="group p-4 rounded-xl border bg-card hover:border-primary/50 transition-all">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <Zap className="w-5 h-5 text-primary" />
+            </div>
+            <h3 className="font-semibold text-sm">Benchmark</h3>
+            <p className="text-xs text-muted-foreground">Prompts testen</p>
+          </a>
+
+          <a href="#alerts" className="group p-4 rounded-xl border bg-card hover:border-primary/50 transition-all">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <Bell className="w-5 h-5 text-primary" />
+            </div>
+            <h3 className="font-semibold text-sm">Preis-Alerts</h3>
+            <p className="text-xs text-muted-foreground">Benachrichtigungen</p>
+          </a>
+        </div>
+
         {/* Welcome Section */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">

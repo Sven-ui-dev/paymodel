@@ -152,59 +152,44 @@ export default function Home() {
       <StatsBar modelCount={modelCount} providerCount={providerCount} />
 
       <main>
-        {/* Hero Section */}
-        <section className="py-16 px-4 text-center bg-gradient-to-b from-background to-muted/30">
-          <div className="container mx-auto max-w-3xl">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Alle Modelle. Alle Preise. Ein Blick.
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Aktuelle Token-Preise, Geschwindigkeit und Qualität der wichtigsten AI-Modelle im direkten Vergleich. 100% neutral und unabhängig von Anbietern. Keine Verwendung von Affiliate-Links.
-            </p>
+        {/* Features Section */}
+        <section id="features" className="py-12 px-4">
+          <div className="container mx-auto">
+            <h2 className="text-2xl font-bold mb-8 text-center">Features</h2>
             
-            {/* Provider Logos */}
-            <div className="flex flex-wrap gap-4 justify-center mb-8">
-              {providers.slice(0, 12).map((provider) => (
-                <div 
-                  key={provider.id}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border/50"
-                >
-                  <img 
-                    src={getProviderLogo(provider.slug) || ''} 
-                    alt={provider.name}
-                    className="w-5 h-5 rounded"
-                    style={{ 
-                      backgroundColor: getProviderColor(provider.slug),
-                      display: getProviderLogo(provider.slug) ? 'block' : 'none'
-                    }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                  <span 
-                    className="w-2 h-2 rounded-full" 
-                    style={{ backgroundColor: getProviderColor(provider.slug) }}
-                  />
-                  <span className="text-sm font-medium">{provider.name}</span>
+            {/* Feature Cards - Bento Grid */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Preisvergleich */}
+              <a href="#preisvergleich" className="group p-6 rounded-xl border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <BarChart3 className="w-6 h-6 text-primary" />
                 </div>
-              ))}
-            </div>
-            
-            <div className="flex flex-wrap gap-3 justify-center">
-              <Button asChild size="lg">
-                <a href="#preisvergleich">Preisvergleich</a>
-              </Button>
-              <Button variant="outline" size="lg" asChild>
-                <a href="#kostenrechner">Kostenrechner</a>
-              </Button>
-              <Button variant="secondary" size="lg" asChild>
-                <a href="#waitlist">Benchmark-Zugang sichern</a>
-              </Button>
+                <h3 className="text-lg font-semibold mb-2">Preisvergleich</h3>
+                <p className="text-sm text-muted-foreground">Vergleiche Preise von über 300 AI-Modellen</p>
+              </a>
+
+              {/* Kostenrechner */}
+              <a href="#kostenrechner" className="group p-6 rounded-xl border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <DollarSign className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Kostenrechner</h3>
+                <p className="text-sm text-muted-foreground">Berechne die Kosten für deinen Use-Case</p>
+              </a>
+
+              {/* Benchmark */}
+              <a href="#benchmark" className="group p-6 rounded-xl border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Zap className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Benchmark</h3>
+                <p className="text-sm text-muted-foreground">Teste deine Prompts gegen alle Modelle</p>
+              </a>
             </div>
           </div>
         </section>
 
-        {/* Preisvergleich Section */}
+        {/* Search / Filter */}
         <section id="preisvergleich" className="py-12 px-4">
           <div className="container mx-auto">
             <h3 className="text-2xl font-bold mb-6">Preisvergleich</h3>
