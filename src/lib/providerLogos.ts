@@ -1,8 +1,9 @@
 // Provider Logos - using inline SVGs for reliable display
 
-// Generate SVG data URI for a provider
+// Generate SVG data URI for a provider - larger for mobile
 function createProviderSVG(name: string, color: string): string {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30"><rect width="100" height="30" rx="4" fill="${color}"/><text x="8" y="20" font-family="Arial,sans-serif" font-size="12" font-weight="bold" fill="white">${name}</text></svg>`;
+  // Create larger SVG with proper viewBox
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50"><rect width="200" height="50" rx="8" fill="${color}"/><text x="12" y="32" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="white">${name}</text></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
