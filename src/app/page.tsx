@@ -59,6 +59,8 @@ export default function Home() {
     noSpam: "Kein Spam. Abmeldung jederzeit.",
     joinWaitlist: "Auf die Warteliste",
     moreThanPriceComparison: "Mehr als ein Preisvergleich.",
+    benchmarkTitle: "Teste deine Prompts",
+    benchmarkLoginMsg: "Melde dich an, um Benchmarks zu nutzen",
     livePriceComparison: "Live-Preisvergleich",
     personalizedBenchmarks: "Personalisierte Benchmarks",
   } : {
@@ -93,6 +95,8 @@ export default function Home() {
     noSpam: "No spam. Unsubscribe anytime.",
     joinWaitlist: "Join Waitlist",
     moreThanPriceComparison: "More than a price comparison.",
+    benchmarkTitle: "Test your prompts",
+    benchmarkLoginMsg: "Login to use benchmarks",
     livePriceComparison: "Live Price Comparison",
     personalizedBenchmarks: "Personalized Benchmarks",
   };
@@ -407,8 +411,17 @@ export default function Home() {
         {/* Benchmark Section */}
         <section id="benchmark" className="py-12 px-4 bg-muted/30">
           <div className="container mx-auto max-w-2xl">
-            <h3 className="text-2xl font-bold mb-6 text-center">Teste deine Prompts</h3>
-            <BenchmarkTool models={models} />
+            <h3 className="text-2xl font-bold mb-6 text-center">{t.benchmarkTitle}</h3>
+            {user ? (
+              <BenchmarkTool models={models} />
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">{t.benchmarkLoginMsg}</p>
+                <Link href="/login">
+                  <Button>{locale === "de" ? "Anmelden" : "Login"}</Button>
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 
