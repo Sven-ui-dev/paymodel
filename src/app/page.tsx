@@ -42,8 +42,11 @@ export default function Home() {
     benchmarkDesc: "Teste deine Prompts gegen alle Modelle",
     inputPlaceholder: "Input Tokens",
     outputPlaceholder: "Output Tokens",
+    inputLabel: "Input-Tokens / Monat",
+    outputLabel: "Output-Tokens / Monat",
     calculate: "Berechnen",
     totalCost: "Gesamtkosten/Monat",
+    cheapest: "Günstigstes",
     realTimePrices: "Echtzeit-Preise",
     realTimePricesDesc: "Aktuelle Token-Preise aller großen Anbieter. Automatisch aktualisiert.",
     trackSpending: "Ausgaben verfolgen",
@@ -52,8 +55,12 @@ export default function Home() {
     teamSavingsDesc: "Zeige deinem Team, wie viel ihr durch den Modellwechsel spart.",
     waitlistTitle: "Early Access",
     waitlistDesc: "Sichere dir kostenlosen Zugang zum Preisvergleich.",
+    waitlistSuccess: "Vielen Dank! Du bist auf der Warteliste.",
     noSpam: "Kein Spam. Abmeldung jederzeit.",
     joinWaitlist: "Auf die Warteliste",
+    moreThanPriceComparison: "Mehr als ein Preisvergleich.",
+    livePriceComparison: "Live-Preisvergleich",
+    personalizedBenchmarks: "Personalisierte Benchmarks",
   } : {
     heroTitle: "Compare AI Models & Save",
     heroSubtitle: "Find the cheapest AI models for your use cases",
@@ -69,8 +76,11 @@ export default function Home() {
     benchmarkDesc: "Test your prompts against all models",
     inputPlaceholder: "Input Tokens",
     outputPlaceholder: "Output Tokens",
+    inputLabel: "Input tokens / month",
+    outputLabel: "Output tokens / month",
     calculate: "Calculate",
     totalCost: "Total Cost/Month",
+    cheapest: "Cheapest",
     realTimePrices: "Real-time Prices",
     realTimePricesDesc: "Current token prices from all major providers. Automatically updated.",
     trackSpending: "Track Spending",
@@ -79,8 +89,12 @@ export default function Home() {
     teamSavingsDesc: "Show your team how much you save by switching models.",
     waitlistTitle: "Early Access",
     waitlistDesc: "Get free access to the price comparison and be the first to know.",
+    waitlistSuccess: "Thank you! You're on the waitlist.",
     noSpam: "No spam. Unsubscribe anytime.",
     joinWaitlist: "Join Waitlist",
+    moreThanPriceComparison: "More than a price comparison.",
+    livePriceComparison: "Live Price Comparison",
+    personalizedBenchmarks: "Personalized Benchmarks",
   };
 
   useEffect(() => {
@@ -172,7 +186,7 @@ export default function Home() {
       const data = await res.json();
       
       if (res.ok) {
-        setWaitlistMessage({ type: 'success', text: 'Vielen Dank! Du bist auf der Warteliste.' });
+        setWaitlistMessage({ type: 'success', text: t.waitlistSuccess });
         toast.success('Angemeldet!', { description: 'Du bist auf der Early Access Warteliste.' });
         setWaitlistEmail('');
       } else {
@@ -228,7 +242,7 @@ export default function Home() {
                 >
                   <BarChart3 className="w-6 h-6" style={{ color: '#2ECC71' }} />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Preisvergleich</h3>
+                <h3 className="text-lg font-semibold mb-2">{t.priceComparison}</h3>
                 <p className="text-sm text-muted-foreground">{t.priceComparisonDesc}</p>
               </a>
 
@@ -240,7 +254,7 @@ export default function Home() {
                 >
                   <DollarSign className="w-6 h-6" style={{ color: '#2ECC71' }} />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Kostenrechner</h3>
+                <h3 className="text-lg font-semibold mb-2">{t.costCalculator}</h3>
                 <p className="text-sm text-muted-foreground">{t.costCalculatorDesc}</p>
               </a>
 
@@ -262,7 +276,7 @@ export default function Home() {
         {/* Search / Filter */}
         <section id="preisvergleich" className="py-12 px-4">
           <div className="container mx-auto">
-            <h3 className="text-2xl font-bold mb-6">Preisvergleich</h3>
+            <h3 className="text-2xl font-bold mb-6">{t.priceComparison}</h3>
             
             {/* Search */}
             <div className="mb-6">
@@ -343,7 +357,7 @@ export default function Home() {
             <div className="bg-card rounded-xl p-6 shadow-sm">
               <div className="grid grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Input-Tokens / Monat</label>
+                  <label className="block text-sm font-medium mb-2">{t.inputLabel}</label>
                   <input
                     type="number"
                     value={calculatorInput}
@@ -352,7 +366,7 @@ export default function Home() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Output-Tokens / Monat</label>
+                  <label className="block text-sm font-medium mb-2">{t.outputLabel}</label>
                   <input
                     type="number"
                     value={calculatorOutput}
@@ -379,7 +393,7 @@ export default function Home() {
                       <div className="text-right">
                         <p className="font-bold text-lg">€{totalCost.toFixed(2)}/Mo</p>
                         {index === 0 && (
-                          <Badge className="text-xs">Günstigstes</Badge>
+                          <Badge className="text-xs">{t.cheapest}</Badge>
                         )}
                       </div>
                     </div>
@@ -401,7 +415,7 @@ export default function Home() {
         {/* Features Section */}
         <section className="py-16 px-4">
           <div className="container mx-auto max-w-4xl">
-            <h3 id="features" className="text-2xl font-bold mb-8 text-center">Mehr als ein Preisvergleich.</h3>
+            <h3 id="features" className="text-2xl font-bold mb-8 text-center">{t.moreThanPriceComparison}</h3>
             
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex gap-4 p-4">
@@ -412,7 +426,7 @@ export default function Home() {
                   <BarChart3 className="w-5 h-5" style={{ color: '#2ECC71' }} />
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-1">Live-Preisvergleich</h4>
+                  <h4 className="font-semibold mb-1">{t.livePriceComparison}</h4>
                   <p className="text-sm text-muted-foreground">
                     Aktuelle Token-Preise aller großen Anbieter. Automatisch aktualisiert, transparent aufbereitet.
                   </p>
@@ -427,7 +441,7 @@ export default function Home() {
                   <Zap className="w-5 h-5" style={{ color: '#2ECC71' }} />
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-1">Personalisierte Benchmarks</h4>
+                  <h4 className="font-semibold mb-1">{t.personalizedBenchmarks}</h4>
                   <p className="text-sm text-muted-foreground">
                     Lade deine eigenen Prompts hoch und teste sie gegen alle Modelle.
                   </p>
