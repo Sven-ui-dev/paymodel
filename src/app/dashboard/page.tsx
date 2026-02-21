@@ -82,8 +82,8 @@ interface PlanFeature {
 
 const planFeatures: Record<PlanType, PlanFeature[]> = {
   free: [
-    { name: {t.priceComparison}, icon: BarChart3, included: true },
-    { name: {t.costCalculator}, icon: TrendingUp, included: true },
+    { name: "Preisvergleich", icon: BarChart3, included: true },
+    { name: "Kostenrechner", icon: TrendingUp, included: true },
     { name: "5 Modell-Vergleiche/Tag", icon: Zap, included: false },
   ],
   pro: [
@@ -111,16 +111,16 @@ export default function DashboardPage() {
   const { locale } = useLocale();
 
   const t = {
-    dashboard: locale === "de" ? {t.dashboard} : {t.dashboard},
-    welcome: locale === "de" ? {t.welcome} : "Welcome back",
-    quickActions: locale === "de" ? {t.quickActions} : "Quick Actions",
-    currentPlan: locale === "de" ? {t.currentPlan} : "Current Plan",
-    logout: locale === "de" ? {t.logout} : "Logout",
-    priceComparison: locale === "de" ? {t.priceComparison} : "Price Comparison",
-    costCalculator: locale === "de" ? {t.costCalculator} : "Cost Calculator",
-    benchmark: locale === "de" ? {t.benchmark} : {t.benchmark},
-    priceAlerts: locale === "de" ? {t.priceAlerts} : "Price Alerts",
-    allPlans: locale === "de" ? {t.allPlans} : "All Plans",
+    dashboard: "Dashboard",
+    welcome: locale === "de" ? "Willkommen zurück" : "Welcome back",
+    quickActions: locale === "de" ? "Schnellzugriff" : "Quick Actions",
+    currentPlan: locale === "de" ? "Aktueller Plan" : "Current Plan",
+    logout: locale === "de" ? "Abmelden" : "Logout",
+    priceComparison: locale === "de" ? "Preisvergleich" : "Price Comparison",
+    costCalculator: locale === "de" ? "Kostenrechner" : "Cost Calculator",
+    benchmark: locale === "de" ? "Benchmark" : "Benchmark",
+    priceAlerts: locale === "de" ? "Preisbenachrichtigungen" : "Price Alerts",
+    allPlans: locale === "de" ? "Alle Pläne" : "All Plans",
   };
 
   const router = useRouter();
