@@ -13,7 +13,8 @@ import { PriceAlertsList } from "@/components/PriceAlertsList";
 import { BenchmarkTool } from "@/components/BenchmarkTool";
 import { ApiKeysManager } from "@/components/ApiKeysManager";
 import { getModels, CurrentPrice } from "@/lib/supabase";
-import { 
+import { useLocale } from "@/components/LocaleProvider";
+import {
   Loader2,
   CreditCard,
   LogOut,
@@ -104,7 +105,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const { locale } = useLocale();
   const { locale } = useLocale();
-  
+
   const t = {
     dashboard: locale === "de" ? {t.dashboard} : {t.dashboard},
     welcome: locale === "de" ? {t.welcome} : "Welcome back",
@@ -157,11 +158,11 @@ export default function DashboardPage() {
         subscription_status: "inactive",
       });
     }
-    
+
     // Load models for benchmark
     const modelsData = await getModels();
     setModels(modelsData || []);
-    
+
     setLoading(false);
   };
 
@@ -649,7 +650,7 @@ export default function DashboardPage() {
       {/* Footer */}
       <footer className="border-t mt-8 sm:mt-12 py-6">
         <div className="container mx-auto px-4 text-center text-xs sm:text-sm text-muted-foreground">
-          <p>© 2026 paymodel.ai – Alle Rechte vorbehalten.</p>
+          <p>© 2026 paymodel.ai - Alle Rechte vorbehalten.</p>
           <div className="flex justify-center gap-3 sm:gap-4 mt-2">
             <Link href="/impressum" className="hover:text-foreground transition-colors">
               Impressum
