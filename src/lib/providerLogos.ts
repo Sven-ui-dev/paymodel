@@ -23,13 +23,13 @@ export const providerLogos: Record<string, string> = {
   
   // Chinese providers - using brand colors as fallback
   'minimax': 'https://minimax.io/favicon.ico',
-  'z-ai': 'https://z-ai.cn/favicon.ico',
+  'z-ai': 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235565FF"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
   'moonshotai': 'https://platform.moonshot.cn/favicon.ico',
   'stepfun': 'https://stepfun.com/favicon.ico',
-  'baidu': 'https://upload.wikimedia.org/wikipedia/commons/0/09/Baidu_%28website%29_logo.svg',
-  'bytedance': 'https://upload.wikimedia.org/wikipedia/commons/6/67/ByteDance_logo.svg',
-  'tongyi': 'https://upload.wikimedia.org/wikipedia/commons/0/09/Baidu_%28website%29_logo.svg',
-  'qwen': 'https://upload.wikimedia.org/wikipedia/commons/0/09/Baidu_%28website%29_logo.svg',
+  'baidu': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/baidu.svg',
+  'bytedance': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/bytedance.svg',
+  'tongyi': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/baidu.svg',
+  'qwen': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/baidu.svg',
   
   // Other providers
   'arcee-ai': 'https://arcee.ai/wp-content/uploads/2024/05/arcee-ai-logo.svg',
@@ -41,7 +41,7 @@ export const providerLogos: Record<string, string> = {
   'allenai': 'https://allenai.org/olmo/assets/img/ai2-logo-full.svg',
   'olmo': 'https://allenai.org/olmo/assets/img/ai2-logo-full.svg',
   'cerebras': 'https://cerebras.net/wp-content/uploads/2023/09/cerebras_logo.svg',
-  'nvidia': 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Nvidia_logo.svg',
+  'nvidia': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/nvidia.svg',
   'fireworks': 'https://fireworks.ai/assets/images/logo.svg',
   'anyscale': 'https://docs.anyscale.com/assets/logo-full.png',
   'together': 'https://together.ai/together-logo.svg',
