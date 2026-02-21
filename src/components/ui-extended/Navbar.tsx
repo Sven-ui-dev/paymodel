@@ -115,7 +115,16 @@ export function Navbar({ user }: NavbarProps) {
               >
                 API Doku
               </Link>
-              {user ? (
+              <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setLocale(locale === "de" ? "en" : "de")}
+            className="text-xs font-medium"
+          >
+            {locale === "de" ? "EN" : "DE"}
+          </Button>
+          
+          {user ? (
                 <Link 
                   href="/dashboard" 
                   className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"

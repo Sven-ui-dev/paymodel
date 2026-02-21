@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "home": "Home",
+    "pricing": "Pricing",
+    "login": "Login",
+    "dashboard": "Dashboard"
+  },
+  "hero": {
+    "title": "Alle Modelle. Alle Preise. Ein Blick.",
+    "subtitle": "Aktuelle Token-Preise, Geschwindigkeit und Qualität der wichtigsten AI-Modelle im direkten Vergleich.",
+    "cta": "Preisvergleich",
+    "cta2": "Kostenrechner"
+  },
+  "features": {
+    "title": "Alle Modelle. Alle Preise. Ein Blick.",
+    "priceComparison": "Preisvergleich",
+    "priceComparisonDesc": "Vergleiche Preise von über 300 AI-Modellen",
+    "costCalculator": "Kostenrechner",
+    "costCalculatorDesc": "Berechne die Kosten für deinen Use-Case",
+    "benchmark": "Benchmark",
+    "benchmarkDesc": "Teste deine Prompts gegen alle Modelle"
+  },
+  "footer": {
+    "imprint": "Impressum",
+    "privacy": "Datenschutz",
+    "api": "API"
+  },
+  "pricing": {
+    "title": "Preise",
+    "free": "Free",
+    "pro": "Pro",
+    "business": "Business",
+    "month": "/Monat",
+    "year": "/Jahr",
+    "features": {
+      "priceComparison": "Preisvergleich",
+      "costCalculator": "Kostenrechner",
+      "limitedComparisons": "5 Modell-Vergleiche/Tag",
+      "unlimitedComparisons": "Unbegrenzter Preisvergleich",
+      "realTimePrices": "Echtzeit-Preise",
+      "priceAlerts": "Preis-Benachrichtigungen",
+      "exports": "Export-Funktionen",
+      "apiAccess": "API-Zugang",
+      "teamFeatures": "Team-Funktionen",
+      "prioritySupport": "Prioritäts-Support",
+      "customIntegrations": "Custom Integrations"
+    },
+    "cta": "Jetzt starten",
+    "upgrade": "Upgrade"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Willkommen zurück",
+    "quickActions": "Schnellaktionen",
+    "currentPlan": "Aktueller Plan",
+    "logout": "Abmelden"
+  },
+  "models": {
+    "search": "Modelle suchen...",
+    "provider": "Provider",
+    "inputPrice": "Input / 1M",
+    "outputPrice": "Output / 1M",
+    "context": "Kontext",
+    "features": "Features"
+  }
+}
