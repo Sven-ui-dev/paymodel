@@ -12,18 +12,21 @@ interface LocaleContextType {
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>("de");
+  const [locale, setLocale] = useState<Locale | null>(null);
 
   useEffect(() => {
+    // Check localStorage first
+    const saved = localStorage.getItem("locale") as Locale;
+    if (saved && (saved === "de" || saved === "en")) {
+      setLocale(saved);
+      return;
+    }
     // Auto-detect from browser
     const browserLang = navigator.language.split("-")[0];
     if (browserLang === "en") {
       setLocale("en");
-    }
-    // Check localStorage
-    const saved = localStorage.getItem("locale") as Locale;
-    if (saved && (saved === "de" || saved === "en")) {
-      setLocale(saved);
+    } else {
+      setLocale("de");
     }
   }, []);
 
@@ -31,6 +34,11 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     setLocale(newLocale);
     localStorage.setItem("locale", newLocale);
   };
+
+  // Prevent hydration mismatch
+  if (locale === null) {
+    return null;
+  }
 
   return (
     <LocaleContext.Provider value={{ locale, setLocale: handleSetLocale }}>
