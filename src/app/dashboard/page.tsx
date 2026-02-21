@@ -37,6 +37,8 @@ import {
   LucideProps,
   PieChart,
 } from "lucide-react";
+import { useLocale } from "@/components/LocaleProvider";
+
 import Link from "next/link";
 
 // Helper function to format date
