@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Calculator, Play, CheckCircle, Loader2, Upload, Trash2, Clock, DollarSign, Zap, AlertCircle } from "lucide-react";
 import type { CurrentPrice } from "@/lib/supabase";
+import { useLocale } from "@/components/LocaleProvider";
 
 interface BenchmarkResult {
   id?: string;
@@ -40,6 +41,15 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
   const [history, setHistory] = useState<BenchmarkResult[]>([]);
   const [useMultiPrompt, setUseMultiPrompt] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { locale } = useLocale();
+  
+  const title = locale === "de" ? "Personalisierter Benchmark" : "Personalized Benchmark";
+  const singlePrompt = locale === "de" ? "Einzelner Prompt" : "Single Prompt";
+  const multiPrompt = locale === "de" ? "Mehrere Prompts (CSV/TXT)" : "Multiple Prompts (CSV/TXT)";
+  const upload = locale === "de" ? "Datei hochladen (CSV/TXT)" : "Upload file (CSV/TXT)";
+  const run = locale === "de" ? "Benchmark starten" : "Start Benchmark";
+  const running = locale === "de" ? "Benchmark läuft..." : "Benchmark running...";
+  const resultsTitle = locale === "de" ? "Ergebnisse" : "Results";
 
   const toggleModel = (modelId: string) => {
     setSelectedModels((prev) =>
