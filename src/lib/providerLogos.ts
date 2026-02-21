@@ -2,24 +2,24 @@
 
 export const providerLogos: Record<string, string> = {
   // Major AI Providers - Official logo URLs
-  'openai': 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg',
-  'anthropic': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_Logo.svg',
-  'anthropic-claude': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_Logo.svg',
-  'google': 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg',
-  'google-gemini': 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg',
-  'mistral': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Mistral_Logo.svg',
-  'deepseek': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/DeepSeek_Logo.svg/200px-DeepSeek_Logo.svg.png',
-  'groq': 'https://groq.com/wp-content/uploads/2024/02/groq-logo.svg',
-  'xai': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Logo_of_X.svg/200px-Logo_of_X.svg.png',
-  'meta': 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg',
-  'meta-llama': 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg',
-  'cohere': 'https://docs.cohere.com/docs/images/cohere-logo.svg',
-  'perplexity': 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Perplexity_AI_logo.svg',
+  'openai': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/openai.svg',
+  'anthropic': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/anthropic.svg',
+  'anthropic-claude': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/anthropic.svg',
+  'google': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/google.svg',
+  'google-gemini': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/googlecloud.svg',
+  'mistral': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/mistral.svg',
+  'deepseek': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/deepseek.svg',
+  'groq': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/groq.svg',
+  'xai': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/x.svg',
+  'meta': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/meta.svg',
+  'meta-llama': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/meta.svg',
+  'cohere': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/cohere.svg',
+  'perplexity': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/perplexity.svg',
   
   // Cloud providers
-  'aws-bedrock': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg',
-  'aws': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg',
-  'azure': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Azure_logo.svg',
+  'aws-bedrock': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/amazonaws.svg',
+  'aws': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/amazonaws.svg',
+  'azure': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/microsoftazure.svg',
   
   // Chinese providers - using brand colors as fallback
   'minimax': 'https://minimax.io/favicon.ico',
