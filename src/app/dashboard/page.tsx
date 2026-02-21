@@ -102,7 +102,7 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [models, setModels] = useState<CurrentPrice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [manageLoading, setManageLoading] = useState(false);
+  const { locale } = useLocale();
   const { locale } = useLocale();
   
   const t = {
