@@ -25,6 +25,14 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<any>(null);
 
+  const t = {
+    heroTitle: "AI-Modelle vergleichen & sparen",
+    heroSubtitle: "Finde die günstigsten AI-Modelle für deine Use Cases",
+    features: "Funktionen",
+    pricing: "Preise",
+    dashboard: "Dashboard",
+  };
+
   useEffect(() => {
     // Check if user is logged in
     import("@/lib/supabase/client").then(({ createClient }) => {

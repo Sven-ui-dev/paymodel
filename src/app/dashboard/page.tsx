@@ -37,9 +37,6 @@ import {
   LucideProps,
   PieChart,
 } from "lucide-react";
-import { useLocale } from "@/components/LocaleProvider";
-
-import { useLocale } from "@/components/LocaleProvider";
 
 import Link from "next/link";
 
@@ -107,7 +104,7 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [models, setModels] = useState<CurrentPrice[]>([]);
   const [loading, setLoading] = useState(true);
-  const { locale } = useLocale();
+  const [manageLoading, setManageLoading] = useState(false);
   const { locale } = useLocale();
 
   const t = {

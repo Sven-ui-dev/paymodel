@@ -13,6 +13,7 @@ interface SearchFilterProps {
   onProviderChange?: (providerSlug: string | undefined) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
+  searchPlaceholder?: string;
 }
 
 export function SearchFilter({
@@ -21,6 +22,7 @@ export function SearchFilter({
   onProviderChange,
   searchQuery = "",
   onSearchChange,
+  searchPlaceholder = "Modelle suchen...",
 }: SearchFilterProps) {
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const [isPending, startTransition] = useTransition();
