@@ -103,6 +103,20 @@ export default function DashboardPage() {
   const [models, setModels] = useState<CurrentPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [manageLoading, setManageLoading] = useState(false);
+  const { locale } = useLocale();
+  
+  const t = {
+    dashboard: locale === "de" ? "Dashboard" : "Dashboard",
+    welcome: locale === "de" ? "Willkommen zurück" : "Welcome back",
+    quickActions: locale === "de" ? "Schnellaktionen" : "Quick Actions",
+    currentPlan: locale === "de" ? "Aktueller Plan" : "Current Plan",
+    logout: locale === "de" ? "Abmelden" : "Logout",
+    priceComparison: locale === "de" ? "Preisvergleich" : "Price Comparison",
+    costCalculator: locale === "de" ? "Kostenrechner" : "Cost Calculator",
+    benchmark: locale === "de" ? "Benchmark" : "Benchmark",
+    priceAlerts: locale === "de" ? "Preis-Alerts" : "Price Alerts",
+    allPlans: locale === "de" ? "Alle Pläne" : "All Plans",
+  };
 
   const router = useRouter();
   const supabase = createClient();
