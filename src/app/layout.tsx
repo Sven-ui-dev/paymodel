@@ -60,6 +60,7 @@ export default function RootLayout({
         </LocaleProvider>
         <Toaster richColors position="top-center" />
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
