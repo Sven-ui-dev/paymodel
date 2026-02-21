@@ -16,6 +16,7 @@ import { ModelTable } from "@/components/ui-extended/ModelTable";
 import { Bell, BarChart3, Github, Menu, ExternalLink, Zap, Target, DollarSign, Shield, TrendingUp, Eye } from "lucide-react";
 import Link from "next/link";
 import { getProviderLogo, getProviderColor } from "@/lib/providerLogos";
+import { useLocale } from "@/components/LocaleProvider";
 
 export default function Home() {
   const [models, setModels] = useState<CurrentPrice[]>([]);
@@ -24,13 +25,62 @@ export default function Home() {
   const [selectedProvider, setSelectedProvider] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<any>(null);
-
-  const t = {
+  const { locale } = useLocale();
+  
+  const t = locale === "de" ? {
     heroTitle: "AI-Modelle vergleichen & sparen",
     heroSubtitle: "Finde die günstigsten AI-Modelle für deine Use Cases",
     features: "Funktionen",
     pricing: "Preise",
     dashboard: "Dashboard",
+    featuresTitle: "Alle Modelle. Alle Preise. Ein Blick.",
+    priceComparison: "Preisvergleich",
+    priceComparisonDesc: "Vergleiche Preise von über 300 AI-Modellen",
+    costCalculator: "Kostenrechner",
+    costCalculatorDesc: "Berechne die Kosten für deinen Use-Case",
+    benchmark: "Benchmark",
+    benchmarkDesc: "Teste deine Prompts gegen alle Modelle",
+    inputPlaceholder: "Input Tokens",
+    outputPlaceholder: "Output Tokens",
+    calculate: "Berechnen",
+    totalCost: "Gesamtkosten/Monat",
+    realTimePrices: "Echtzeit-Preise",
+    realTimePricesDesc: "Aktuelle Token-Preise aller großen Anbieter. Automatisch aktualisiert.",
+    trackSpending: "Ausgaben verfolgen",
+    trackSpendingDesc: "Verbinde deine API-Keys und sieh in Echtzeit, wo dein Geld hinfließt.",
+    teamSavings: "Team-Updates",
+    teamSavingsDesc: "Zeige deinem Team, wie viel ihr durch den Modellwechsel spart.",
+    waitlistTitle: "Early Access",
+    waitlistDesc: "Sichere dir kostenlosen Zugang zum Preisvergleich.",
+    noSpam: "Kein Spam. Abmeldung jederzeit.",
+    joinWaitlist: "Auf die Warteliste",
+  } : {
+    heroTitle: "Compare AI Models & Save",
+    heroSubtitle: "Find the cheapest AI models for your use cases",
+    features: "Features",
+    pricing: "Pricing",
+    dashboard: "Dashboard",
+    featuresTitle: "All Models. All Prices. One Look.",
+    priceComparison: "Price Comparison",
+    priceComparisonDesc: "Compare prices of 300+ AI models",
+    costCalculator: "Cost Calculator",
+    costCalculatorDesc: "Calculate costs for your use case",
+    benchmark: "Benchmark",
+    benchmarkDesc: "Test your prompts against all models",
+    inputPlaceholder: "Input Tokens",
+    outputPlaceholder: "Output Tokens",
+    calculate: "Calculate",
+    totalCost: "Total Cost/Month",
+    realTimePrices: "Real-time Prices",
+    realTimePricesDesc: "Current token prices from all major providers. Automatically updated.",
+    trackSpending: "Track Spending",
+    trackSpendingDesc: "Connect your API keys and see where your money goes in real-time.",
+    teamSavings: "Team Updates",
+    teamSavingsDesc: "Show your team how much you save by switching models.",
+    waitlistTitle: "Early Access",
+    waitlistDesc: "Get free access to the price comparison and be the first to know.",
+    noSpam: "No spam. Unsubscribe anytime.",
+    joinWaitlist: "Join Waitlist",
   };
 
   useEffect(() => {
@@ -179,7 +229,7 @@ export default function Home() {
                   <BarChart3 className="w-6 h-6" style={{ color: '#2ECC71' }} />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Preisvergleich</h3>
-                <p className="text-sm text-muted-foreground">Vergleiche Preise von über 300 AI-Modellen</p>
+                <p className="text-sm text-muted-foreground">{t.priceComparisonDesc}</p>
               </a>
 
               {/* Kostenrechner */}
@@ -191,7 +241,7 @@ export default function Home() {
                   <DollarSign className="w-6 h-6" style={{ color: '#2ECC71' }} />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Kostenrechner</h3>
-                <p className="text-sm text-muted-foreground">Berechne die Kosten für deinen Use-Case</p>
+                <p className="text-sm text-muted-foreground">{t.costCalculatorDesc}</p>
               </a>
 
               {/* Benchmark */}
@@ -202,8 +252,8 @@ export default function Home() {
                 >
                   <Zap className="w-6 h-6" style={{ color: '#2ECC71' }} />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Benchmark</h3>
-                <p className="text-sm text-muted-foreground">Teste deine Prompts gegen alle Modelle</p>
+                <h3 className="text-lg font-semibold mb-2">{t.benchmark}</h3>
+                <p className="text-sm text-muted-foreground">{t.benchmarkDesc}</p>
               </a>
             </div>
           </div>
@@ -450,14 +500,14 @@ export default function Home() {
         {/* Early Access Section */}
         <section id="waitlist" className="py-16 px-4 bg-primary/5">
           <div className="container mx-auto max-w-xl text-center">
-            <h3 className="text-2xl font-bold mb-4">Early Access</h3>
+            <h3 className="text-2xl font-bold mb-4">{t.waitlistTitle}</h3>
             <p className="text-muted-foreground mb-6">
               Sichere dir kostenlosen Zugang zum Preisvergleich und werde als Erster benachrichtigt, wenn der personalisierte Benchmark-Service startet.
             </p>
             <form onSubmit={handleWaitlistSubmit} className="flex gap-2 justify-center">
               <Input 
                 type="email" 
-                placeholder="Deine E-Mail-Adresse" 
+                placeholder={locale === "de" ? "Deine E-Mail-Adresse" : "Your email address"} 
                 className="max-w-xs"
                 value={waitlistEmail}
                 onChange={(e) => setWaitlistEmail(e.target.value)}
@@ -474,7 +524,7 @@ export default function Home() {
               </p>
             )}
             <p className="text-xs text-muted-foreground mt-3">
-              Kein Spam. Abmeldung jederzeit.
+              {t.noSpam}
             </p>
           </div>
         </section>
