@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "home": "Home",
+    "pricing": "Pricing",
+    "login": "Login",
+    "dashboard": "Dashboard"
+  },
+  "hero": {
+    "title": "All Models. All Prices. One Look.",
+    "subtitle": "Current token prices, speed and quality of the most important AI models in direct comparison.",
+    "cta": "Price Comparison",
+    "cta2": "Cost Calculator"
+  },
+  "features": {
+    "title": "All Models. All Prices. One Look.",
+    "priceComparison": "Price Comparison",
+    "priceComparisonDesc": "Compare prices of 300+ AI models",
+    "costCalculator": "Cost Calculator",
+    "costCalculatorDesc": "Calculate costs for your use case",
+    "benchmark": "Benchmark",
+    "benchmarkDesc": "Test your prompts against all models"
+  },
+  "footer": {
+    "imprint": "Imprint",
+    "privacy": "Privacy",
+    "api": "API"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "free": "Free",
+    "pro": "Pro",
+    "business": "Business",
+    "month": "/month",
+    "year": "/year",
+    "features": {
+      "priceComparison": "Price Comparison",
+      "costCalculator": "Cost Calculator",
+      "limitedComparisons": "5 Model Comparisons/Day",
+      "unlimitedComparisons": "Unlimited Price Comparison",
+      "realTimePrices": "Real-time Prices",
+      "priceAlerts": "Price Alerts",
+      "exports": "Export Functions",
+      "apiAccess": "API Access",
+      "teamFeatures": "Team Features",
+      "prioritySupport": "Priority Support",
+      "customIntegrations": "Custom Integrations"
+    },
+    "cta": "Get Started",
+    "upgrade": "Upgrade"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "quickActions": "Quick Actions",
+    "currentPlan": "Current Plan",
+    "logout": "Logout"
+  },
+  "models": {
+    "search": "Search models...",
+    "provider": "Provider",
+    "inputPrice": "Input / 1M",
+    "outputPrice": "Output / 1M",
+    "context": "Context",
+    "features": "Features"
+  }
+}

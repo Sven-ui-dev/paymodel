@@ -13,7 +13,8 @@ import { PriceAlertsList } from "@/components/PriceAlertsList";
 import { BenchmarkTool } from "@/components/BenchmarkTool";
 import { ApiKeysManager } from "@/components/ApiKeysManager";
 import { getModels, CurrentPrice } from "@/lib/supabase";
-import { 
+import { useLocale } from "@/components/LocaleProvider";
+import {
   Loader2,
   CreditCard,
   LogOut,
@@ -36,6 +37,7 @@ import {
   LucideProps,
   PieChart,
 } from "lucide-react";
+
 import Link from "next/link";
 
 // Helper function to format date
@@ -103,6 +105,20 @@ export default function DashboardPage() {
   const [models, setModels] = useState<CurrentPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [manageLoading, setManageLoading] = useState(false);
+  const { locale } = useLocale();
+
+  const t = {
+    dashboard: "Dashboard",
+    welcome: locale === "de" ? "Willkommen zurück" : "Welcome back",
+    quickActions: locale === "de" ? "Schnellzugriff" : "Quick Actions",
+    currentPlan: locale === "de" ? "Aktueller Plan" : "Current Plan",
+    logout: locale === "de" ? "Abmelden" : "Logout",
+    priceComparison: locale === "de" ? "Preisvergleich" : "Price Comparison",
+    costCalculator: locale === "de" ? "Kostenrechner" : "Cost Calculator",
+    benchmark: locale === "de" ? "Benchmark" : "Benchmark",
+    priceAlerts: locale === "de" ? "Preisbenachrichtigungen" : "Price Alerts",
+    allPlans: locale === "de" ? "Alle Pläne" : "All Plans",
+  };
 
   const router = useRouter();
   const supabase = createClient();
@@ -143,11 +159,11 @@ export default function DashboardPage() {
         subscription_status: "inactive",
       });
     }
-    
+
     // Load models for benchmark
     const modelsData = await getModels();
     setModels(modelsData || []);
-    
+
     setLoading(false);
   };
 
@@ -635,7 +651,7 @@ export default function DashboardPage() {
       {/* Footer */}
       <footer className="border-t mt-8 sm:mt-12 py-6">
         <div className="container mx-auto px-4 text-center text-xs sm:text-sm text-muted-foreground">
-          <p>© 2026 paymodel.ai – Alle Rechte vorbehalten.</p>
+          <p>© 2026 paymodel.ai - Alle Rechte vorbehalten.</p>
           <div className="flex justify-center gap-3 sm:gap-4 mt-2">
             <Link href="/impressum" className="hover:text-foreground transition-colors">
               Impressum

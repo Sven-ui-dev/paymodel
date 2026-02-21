@@ -54,7 +54,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <LocaleProvider>
+          {children}
+        </LocaleProvider>
         <Toaster richColors position="top-center" />
         <SpeedInsights />
         <Analytics />

@@ -266,33 +266,20 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
                 <td className="p-3 font-medium">{model.model_name}</td>
                 <td className="p-3">
                   <div className="flex items-center gap-2">
-                    {model.provider_slug && (
-                      <img 
-                        src={getProviderLogo(model.provider_slug) || ''} 
-                        alt={model.provider_name}
-                        className="w-5 h-5 rounded"
-                        style={{ 
-                          backgroundColor: getProviderColor(model.provider_slug),
-                          display: getProviderLogo(model.provider_slug) ? 'block' : 'none'
-                        }}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    )}
-                    <Badge 
-                      variant="outline" 
-                      className="gap-1"
-                      style={{ borderColor: getProviderColor(model.provider_slug) }}
+                    <img 
+                      src={getProviderLogo(model.provider_slug) || ''} 
+                      alt={model.provider_name}
+                      style={{ width: '160px', height: '40px', display: getProviderLogo(model.provider_slug) ? 'block' : 'none' }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <span 
+                      className="text-sm"
+                      style={{ display: getProviderLogo(model.provider_slug) ? 'none' : 'inline' }}
                     >
-                      {model.provider_slug && (
-                        <span 
-                          className="w-2 h-2 rounded-full" 
-                          style={{ backgroundColor: getProviderColor(model.provider_slug) }}
-                        />
-                      )}
                       {model.provider_name}
-                    </Badge>
+                    </span>
                   </div>
                 </td>
                 <td className="p-3 text-right font-medium">

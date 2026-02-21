@@ -1,126 +1,104 @@
-// Provider Logo Mapping
-// Using clearbit logo API and manual fallbacks
+// Provider Logos - Official URLs
 
 export const providerLogos: Record<string, string> = {
+  // Major AI Providers - Official logo URLs
   'openai': 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg',
   'anthropic': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_Logo.svg',
+  'anthropic-claude': 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_Logo.svg',
   'google': 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg',
+  'google-gemini': 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg',
   'mistral': 'https://upload.wikimedia.org/wikipedia/commons/e/e6/Mistral_Logo.svg',
-  'deepseek': 'https://platform.deepseek.com/favicon.ico',
-  'groq': 'https://groq.com/favicon.ico',
-  'xai': 'https://x.ai/favicon.ico',
+  'deepseek': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/DeepSeek_Logo.svg/200px-DeepSeek_Logo.svg.png',
+  'groq': 'https://groq.com/wp-content/uploads/2024/02/groq-logo.svg',
+  'xai': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Logo_of_X.svg/200px-Logo_of_X.svg.png',
   'meta': 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg',
-  'cohere': 'https://cohere.com/favicon.ico',
+  'meta-llama': 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg',
+  'cohere': 'https://docs.cohere.com/docs/images/cohere-logo.svg',
   'perplexity': 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Perplexity_AI_logo.svg',
+  
+  // Cloud providers
   'aws-bedrock': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg',
   'aws': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg',
-  'openrouter': 'https://openrouter.ai/favicon.ico',
-  'minimax': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg',
+  'azure': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Azure_logo.svg',
+  
+  // Chinese providers - using brand colors as fallback
+  'minimax': 'https://minimax.io/favicon.ico',
   'z-ai': 'https://z-ai.cn/favicon.ico',
   'moonshotai': 'https://platform.moonshot.cn/favicon.ico',
   'stepfun': 'https://stepfun.com/favicon.ico',
-  'arcee-ai': 'https://arcee.ai/favicon.ico',
-  'upstage': 'https://upstage.ai/favicon.ico',
-  'writer': 'https://writer.com/favicon.ico',
-  'liquid-ai': 'https://liquid.ai/favicon.ico',
-  'allenai': 'https://allenai.org/favicon.ico',
-  'nvidia': 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Nvidia_logo.svg',
   'baidu': 'https://upload.wikimedia.org/wikipedia/commons/0/09/Baidu_%28website%29_logo.svg',
   'bytedance': 'https://upload.wikimedia.org/wikipedia/commons/6/67/ByteDance_logo.svg',
-  'cerebras': 'https://cerebras.ai/favicon.ico',
-  'kat': 'https://kat.academy/favicon.ico',
-  'kat-ml': 'https://kat.academy/favicon.ico',
-  'jamba': 'https://ai21.com/favicon.ico',
-  'fireworks': 'https://fireworks.ai/favicon.ico',
-  'anyscale': 'https://anyscale.com/favicon.ico',
-  'together': 'https://together.ai/favicon.ico',
-  'replicate': 'https://replicate.com/favicon.ico',
-  'lepton': 'https://lepton.ai/favicon.ico',
-};
-
-// Fallback color for providers without logos
-export const providerColors: Record<string, string> = {
-  'openai': '#10A37F',
-  'anthropic': '#D97757',
-  'anthropic-claude': '#D97757',
-  'google': '#4285F4',
-  'mistral': '#FF7000',
-  'deepseek': '#202020',
-  'groq': '#FF4B4B',
-  'xai': '#000000',
-  'meta': '#0668E1',
-  'cohere': '#000000',
-  'perplexity': '#6366F1',
-  'aws-bedrock': '#FF9900',
-  'aws': '#FF9900',
-  'openrouter': '#000000',
-  'minimax': '#6B4EFF',
-  'z-ai': '#6B4EFF',
-  'moonshotai': '#000000',
-  'stepfun': '#000000',
-  'arcee-ai': '#000000',
-  'arcee': '#000000',
-  'upstage': '#000000',
-  'writer': '#000000',
-  'liquid-ai': '#000000',
-  'liquid': '#000000',
-  'allenai': '#000000',
-  'olmo': '#000000',
-  'nvidia': '#76B900',
-  'baidu': '#2932E1',
-  'bytedance': '#3DDC84',
-  'cerebras': '#000000',
-  'kat': '#000000',
-  'kat-ml': '#000000',
-  'jamba': '#000000',
-  'fireworks': '#000000',
-  'anyscale': '#000000',
-  'together': '#000000',
-  'replicate': '#000000',
-  'lepton': '#000000',
+  'tongyi': 'https://upload.wikimedia.org/wikipedia/commons/0/09/Baidu_%28website%29_logo.svg',
+  'qwen': 'https://upload.wikimedia.org/wikipedia/commons/0/09/Baidu_%28website%29_logo.svg',
+  
+  // Other providers
+  'arcee-ai': 'https://arcee.ai/wp-content/uploads/2024/05/arcee-ai-logo.svg',
+  'arcee': 'https://arcee.ai/wp-content/uploads/2024/05/arcee-ai-logo.svg',
+  'upstage': 'https://www.upstage.ai/wp-content/uploads/2024/03/upstage-logo.svg',
+  'writer': 'https://writer.com/wp-content/uploads/2023/10/writer-logo-dark.svg',
+  'liquid-ai': 'https://liquid.ai/wp-content/uploads/2024/01/liquid-logo.svg',
+  'liquid': 'https://liquid.ai/wp-content/uploads/2024/01/liquid-logo.svg',
+  'allenai': 'https://allenai.org/olmo/assets/img/ai2-logo-full.svg',
+  'olmo': 'https://allenai.org/olmo/assets/img/ai2-logo-full.svg',
+  'cerebras': 'https://cerebras.net/wp-content/uploads/2023/09/cerebras_logo.svg',
+  'nvidia': 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Nvidia_logo.svg',
+  'fireworks': 'https://fireworks.ai/assets/images/logo.svg',
+  'anyscale': 'https://docs.anyscale.com/assets/logo-full.png',
+  'together': 'https://together.ai/together-logo.svg',
+  'replicate': 'https://replicate.com/replicate-logo.svg',
+  'lepton': 'https://lepton.ai/assets/logo.svg',
+  'openrouter': 'https://openrouter.ai/favicon.ico',
+  'novita': 'https://novita.ai/favicon.ico',
+  'hyperbolic': 'https://hyperbolic.ai/hyperbolic-logo.svg',
+  'deepinfra': 'https://deepinfra.com/static/logo.svg',
+  'sambanova': 'https://sambanova.ai/hubfs/sambanova-logo.svg',
 };
 
 export function getProviderLogo(providerSlug: string): string | null {
-  // Try exact match first
+  // Try exact match
   if (providerLogos[providerSlug]) {
     return providerLogos[providerSlug];
   }
   
-  // Try without suffix (e.g., "anthropic-claude" -> "anthropic")
+  // Try base slug (first part before dash)
   const baseSlug = providerSlug.split('-')[0];
   if (providerLogos[baseSlug]) {
     return providerLogos[baseSlug];
   }
   
-  // Special cases
-  if (providerSlug.includes('anthropic')) {
-    return 'https://upload.wikimedia.org/wikipedia/commons/7/78/Anthropic_Logo.svg';
+  // Try partial match
+  for (const key of Object.keys(providerLogos)) {
+    if (providerSlug.includes(key) || key.includes(providerSlug)) {
+      return providerLogos[key];
+    }
   }
   
   return null;
 }
 
 export function getProviderColor(providerSlug: string): string {
-  // Try exact match first
-  if (providerColors[providerSlug]) {
-    return providerColors[providerSlug];
-  }
+  // Brand colors for fallback
+  const colors: Record<string, string> = {
+    'openai': '#10A37F',
+    'anthropic': '#D97757',
+    'google': '#4285F4',
+    'mistral': '#FF7000',
+    'deepseek': '#202020',
+    'groq': '#FF4B4B',
+    'xai': '#000000',
+    'meta': '#0668E1',
+    'cohere': '#000000',
+    'perplexity': '#6366F1',
+    'aws': '#FF9900',
+    'azure': '#0078D4',
+    'minimax': '#6B4EFF',
+    'nvidia': '#76B900',
+    'baidu': '#2932E1',
+    'bytedance': '#3DDC84',
+  };
   
-  // Try without suffix
+  if (colors[providerSlug]) return colors[providerSlug];
+  
   const baseSlug = providerSlug.split('-')[0];
-  if (providerColors[baseSlug]) {
-    return providerColors[baseSlug];
-  }
-  
-  // Special cases
-  if (providerSlug.includes('anthropic')) {
-    return '#D97757';
-  }
-  
-  if (providerSlug.includes('minimax')) {
-    return '#6B4EFF';
-  }
-  
-  // Fallback to accent color
-  return '#2ECC71';
+  return colors[baseSlug] || '#2ECC71';
 }

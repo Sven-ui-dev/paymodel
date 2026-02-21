@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Sparkles } from "lucide-react";
+import { useLocale } from "@/components/LocaleProvider";
 
 interface NavbarProps {
   user?: any;
@@ -11,6 +12,7 @@ interface NavbarProps {
 
 export function Navbar({ user }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { locale, setLocale } = useLocale();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -115,7 +117,16 @@ export function Navbar({ user }: NavbarProps) {
               >
                 API Doku
               </Link>
-              {user ? (
+              <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setLocale(locale === "de" ? "en" : "de")}
+            className="text-xs font-medium"
+          >
+            {locale === "de" ? "EN" : "DE"}
+          </Button>
+          
+          {user ? (
                 <Link 
                   href="/dashboard" 
                   className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
