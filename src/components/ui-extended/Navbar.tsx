@@ -14,6 +14,24 @@ export function Navbar({ user }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { locale, setLocale } = useLocale();
 
+  const nav = locale === "de" ? {
+    priceComparison: "Preisvergleich",
+    costCalculator: "Kostenrechner",
+    features: "Features",
+    apiDocs: "API Doku",
+    dashboard: "Dashboard",
+    login: "Login",
+    earlyAccess: "Early Access",
+  } : {
+    priceComparison: "Price Comparison",
+    costCalculator: "Cost Calculator",
+    features: "Features",
+    apiDocs: "API Docs",
+    dashboard: "Dashboard",
+    login: "Login",
+    earlyAccess: "Early Access",
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -33,25 +51,25 @@ export function Navbar({ user }: NavbarProps) {
               href="/#preisvergleich" 
               className="text-sm font-medium hover:text-primary transition-colors"
             >
-              Preisvergleich
+              {nav.priceComparison}
             </Link>
             <Link 
               href="/#kostenrechner" 
               className="text-sm font-medium hover:text-primary transition-colors"
             >
-              Kostenrechner
+              {nav.costCalculator}
             </Link>
             <Link 
               href="/#features" 
               className="text-sm font-medium hover:text-primary transition-colors"
             >
-              Features
+              {nav.features}
             </Link>
             <Link 
               href="/api-docs" 
               className="text-sm font-medium hover:text-primary transition-colors"
             >
-              API Doku
+              {nav.apiDocs}
             </Link>
             {user && (
               <Link 
@@ -67,11 +85,11 @@ export function Navbar({ user }: NavbarProps) {
           <div className="hidden sm:flex items-center gap-3">
             <Button variant="outline" size="sm" asChild>
               <Link href={user ? "/dashboard" : "/login"}>
-                {user ? "Dashboard" : "Login"}
+                {user ? nav.dashboard : nav.login}
               </Link>
             </Button>
             <Button size="sm" asChild>
-              <Link href="/#waitlist">Early Access</Link>
+              <Link href="/#waitlist">{nav.earlyAccess}</Link>
             </Button>
           </div>
 
@@ -94,28 +112,28 @@ export function Navbar({ user }: NavbarProps) {
                 className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Preisvergleich
+                {nav.priceComparison}
               </Link>
               <Link 
                 href="/#kostenrechner" 
                 className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Kostenrechner
+                {nav.costCalculator}
               </Link>
               <Link 
                 href="/#features" 
                 className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Features
+                {nav.features}
               </Link>
               <Link 
                 href="/api-docs" 
                 className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                API Doku
+                {nav.apiDocs}
               </Link>
               <Button 
             variant="ghost" 
@@ -132,7 +150,7 @@ export function Navbar({ user }: NavbarProps) {
                   className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Dashboard
+                  {nav.dashboard}
                 </Link>
               ) : (
                 <>
@@ -141,11 +159,11 @@ export function Navbar({ user }: NavbarProps) {
                     className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Login
+                    {nav.login}
                   </Link>
                   <Button asChild className="mt-2">
                     <Link href="/#waitlist" onClick={() => setMobileMenuOpen(false)}>
-                      Early Access
+                      {nav.earlyAccess}
                     </Link>
                   </Button>
                 </>
