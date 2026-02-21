@@ -52,7 +52,7 @@ export function SearchFilter({
         <div className="relative w-full sm:w-auto sm:flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Modelle suchen..."
+            placeholder={searchPlaceholder}
             value={localSearch}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-10 h-10 text-base w-full"
