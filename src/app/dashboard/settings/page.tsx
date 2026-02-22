@@ -27,6 +27,7 @@ import {
   Fingerprint,
 } from "lucide-react";
 import Link from "next/link";
+import { ApiKeysSection } from "@/components/ApiKeysSection";
 
 interface Profile {
   id: string;
@@ -489,6 +490,9 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* API Keys */}
+        <ApiKeysSection user={user} />
 
         {/* Account Info */}
         <Card className="mb-8">
