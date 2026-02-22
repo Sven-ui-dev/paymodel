@@ -50,6 +50,12 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
   const run = locale === "de" ? "Benchmark starten" : "Start Benchmark";
   const running = locale === "de" ? "Benchmark läuft..." : "Benchmark running...";
   const resultsTitle = locale === "de" ? "Ergebnisse" : "Results";
+  const yourPrompt = locale === "de" ? "Dein Prompt" : "Your Prompt";
+  const multiplePrompts = locale === "de" ? "Mehrere Prompts" : "Multiple Prompts";
+  const estimatedTokens = locale === "de" ? "Geschätzte Tokens:" : "Estimated Tokens:";
+  const selectModels = locale === "de" ? "Modelle auswählen" : "Select Models";
+  const top10 = locale === "de" ? "Top 10" : "Top 10";
+  const none = locale === "de" ? "Keine" : "None";
 
   const toggleModel = (modelId: string) => {
     setSelectedModels((prev) =>
@@ -219,7 +225,7 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
         {/* Prompt Input */}
         <div className="space-y-2">
           <Label htmlFor="prompt">
-            {useMultiPrompt ? "Mehrere Prompts" : "Dein Prompt"}
+            {useMultiPrompt ? multiplePrompts : yourPrompt}
           </Label>
           
           {useMultiPrompt ? (
@@ -261,20 +267,20 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
             />
           )}
           <p className="text-xs text-muted-foreground">
-            Geschätzte Tokens: {prompt.trim() ? Math.ceil(prompt.length / 4) : 0}
+            {estimatedTokens} {prompt.trim() ? Math.ceil(prompt.length / 4) : 0}
           </p>
         </div>
 
         {/* Model Selection */}
         <div className="space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <Label>Modelle auswählen ({selectedModels.length})</Label>
+            <Label>{selectModels} ({selectedModels.length})</Label>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={selectAll}>
-                Top 10
+                {top10}
               </Button>
               <Button variant="outline" size="sm" onClick={clearAll}>
-                Keine
+                {none}
               </Button>
             </div>
           </div>
