@@ -62,6 +62,8 @@ export default function Home() {
     moreThanPriceComparison: "Mehr als ein Preisvergleich.",
     benchmarkTitle: "Teste deine Prompts",
     benchmarkLoginMsg: "Melde dich an, um Benchmarks zu nutzen",
+    calculatorTitle: "Was kostet dein AI-Setup wirklich?",
+    calculatorSubtitle: "Gib dein monatliches Volumen ein und sieh sofort, welches Modell für dich am günstigsten ist.",
     livePriceComparison: "Live-Preisvergleich",
     personalizedBenchmarks: "Personalisierte Benchmarks",
   } : {
@@ -99,6 +101,8 @@ export default function Home() {
     moreThanPriceComparison: "More than a price comparison.",
     benchmarkTitle: "Test your prompts",
     benchmarkLoginMsg: "Login to use benchmarks",
+    calculatorTitle: "What does your AI setup really cost?",
+    calculatorSubtitle: "Enter your monthly volume and see which model is cheapest for you.",
     livePriceComparison: "Live Price Comparison",
     personalizedBenchmarks: "Personalized Benchmarks",
   };
@@ -334,10 +338,8 @@ export default function Home() {
         {/* Kostenrechner Section */}
         <section id="kostenrechner" className="py-12 px-4 bg-muted/30">
           <div className="container mx-auto max-w-2xl">
-            <h3 className="text-2xl font-bold mb-6 text-center">Was kostet dein AI-Setup wirklich?</h3>
-            <p className="text-muted-foreground text-center mb-8">
-              Gib dein monatliches Volumen ein und sieh sofort, welches Modell für dich am günstigsten ist.
-            </p>
+            <h3 className="text-2xl font-bold mb-6 text-center">{t.calculatorTitle}</h3>
+            <p className="text-muted-foreground text-center mb-8">{t.calculatorSubtitle}</p>
 
             {/* Preset Buttons */}
             <div className="flex flex-wrap gap-2 mb-6 justify-center">
