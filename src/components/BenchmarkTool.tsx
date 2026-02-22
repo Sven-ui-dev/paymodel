@@ -199,7 +199,7 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Mode Toggle */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant={!useMultiPrompt ? "default" : "outline"}
             size="sm"
@@ -267,7 +267,7 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
 
         {/* Model Selection */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <Label>Modelle auswählen ({selectedModels.length})</Label>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={selectAll}>
@@ -353,7 +353,7 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
             </h4>
             
             {/* Summary */}
-            <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
               <div>
                 <p className="text-xs text-muted-foreground">Durchschn. Kosten</p>
                 <p className="font-semibold text-lg" style={{ color: '#2ECC71' }}>
@@ -395,7 +395,7 @@ export function BenchmarkTool({ models }: BenchmarkToolProps) {
                           </p>
                         </div>
                       </div>
-                      <div className="flex gap-4 text-xs text-muted-foreground mb-2">
+                      <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-2">
                         <span>In: {result.input_tokens} Tokens</span>
                         <span>Out: {result.output_tokens} Tokens</span>
                       </div>
