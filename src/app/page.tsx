@@ -30,6 +30,7 @@ export default function Home() {
   const t = locale === "de" ? {
     heroTitle: "AI-Modelle vergleichen & sparen",
     heroSubtitle: "Finde die günstigsten AI-Modelle für deine Use Cases",
+    getStarted: "Jetzt starten",
     features: "Funktionen",
     pricing: "Preise",
     dashboard: "Dashboard",
@@ -66,6 +67,7 @@ export default function Home() {
   } : {
     heroTitle: "Compare AI Models & Save",
     heroSubtitle: "Find the cheapest AI models for your use cases",
+    getStarted: "Get Started",
     features: "Features",
     pricing: "Pricing",
     dashboard: "Dashboard",
@@ -235,6 +237,12 @@ export default function Home() {
             <p className="text-lg text-muted-foreground text-center mb-8">
               {t.heroSubtitle}
             </p>
+            
+            <div className="flex justify-center gap-4 mb-8">
+              <a href="#preisvergleich">
+                <Button size="lg">{t.getStarted}</Button>
+              </a>
+            </div>
             
             {/* Feature Cards - Bento Grid */}
             <div className="grid md:grid-cols-3 gap-6">
