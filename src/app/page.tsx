@@ -239,7 +239,7 @@ export default function Home() {
             </p>
             
             <div className="flex justify-center gap-4 mb-8">
-              <a href="#preisvergleich">
+              <a href="/login?register=true">
                 <Button size="lg">{t.getStarted}</Button>
               </a>
             </div>

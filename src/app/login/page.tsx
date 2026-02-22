@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,14 @@ export default function AuthPage() {
   
   const router = useRouter();
   const supabase = createClient();
+
+  // Check URL for mode
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("register") === "true") {
+      setIsLogin(false);
+    }
+  }, []);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +62,16 @@ export default function AuthPage() {
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+    if (error) setError(error.message);
+  };
+
+  const handleAppleLogin = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "apple",
       options: {
         redirectTo: `${window.location.origin}/dashboard`,
       },
@@ -127,6 +145,14 @@ export default function AuthPage() {
               onClick={handleGoogleLogin}
             >
               Mit Google anmelden
+            </Button>
+
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={handleAppleLogin}
+            >
+              Mit Apple anmelden
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">
