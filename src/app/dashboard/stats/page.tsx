@@ -3,48 +3,37 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  Loader2,
-  BarChart3,
-  TrendingUp,
-  Bookmark,
-  Search,
-  DollarSign,
-  Star,
-  ArrowLeft,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Loader2, TrendingUp, DollarSign, Calendar, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-type TimeRange = "7d" | "30d" | "all";
+type TimeRange = "7d" | "30d" | "90d";
+
+interface ProviderCost {
+  provider: string;
+  totalCost: number;
+  modelCount: number;
+  inputTokens: number;
+  outputTokens: number;
+}
 
 interface UsageStats {
-  savedModels: number;
-  totalQueries: number;
-  mostUsedModels: { name: string; count: number; provider: string }[];
-  savingsData: { date: string; amount: number }[];
-  dailyQueries: { date: string; count: number }[];
-  totalSavings: number;
+  totalCost: number;
+  providerCosts: ProviderCost[];
+  recentUsage: any[];
+  monthlyTrend: { month: string; cost: number }[];
 }
 
 export default function StatsPage() {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>("30d");
   const [stats, setStats] = useState<UsageStats>({
-    savedModels: 0,
-    totalQueries: 0,
-    mostUsedModels: [],
-    savingsData: [],
-    dailyQueries: [],
-    totalSavings: 0,
+    totalCost: 0,
+    providerCosts: [],
+    recentUsage: [],
+    monthlyTrend: [],
   });
-
   const router = useRouter();
   const supabase = createClient();
 
@@ -53,10 +42,10 @@ export default function StatsPage() {
   }, []);
 
   useEffect(() => {
-    if (!loading) {
-      fetchStats();
+    if (supabase) {
+      loadStats();
     }
-  }, [timeRange, loading]);
+  }, [timeRange]);
 
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -64,132 +53,78 @@ export default function StatsPage() {
       router.push("/login");
       return;
     }
-    setLoading(false);
+    loadStats();
   };
 
-  const fetchStats = async () => {
+  const loadStats = async () => {
+    setLoading(true);
     try {
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Fetch saved models count
-      const { count: savedModels } = await supabase
-        .from("saved_models")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id);
+      // Calculate date range
+      const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
 
-      // Fetch search queries count
-      const { count: totalQueries } = await supabase
-        .from("search_queries")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id);
-
-      // Fetch most used models
-      const { data: mostUsedModelsData } = await supabase
-        .from("search_queries")
-        .select("model_name, model_provider, count")
+      // Get benchmark results for the user
+      const { data: results, error } = await supabase
+        .from("benchmark_results")
+        .select("*")
         .eq("user_id", user.id)
-        .gte("created_at", getTimeRangeDate(timeRange))
+        .gte("created_at", startDate.toISOString())
         .order("created_at", { ascending: false });
 
-      // Aggregate most used models
-      const modelCounts: Record<string, { count: number; provider: string }> = {};
-      mostUsedModelsData?.forEach((item) => {
-        if (item.model_name) {
-          if (!modelCounts[item.model_name]) {
-            modelCounts[item.model_name] = { count: 0, provider: item.model_provider || "Unknown" };
-          }
-          modelCounts[item.model_name].count += 1;
+      if (error) {
+        console.error("Error loading stats:", error);
+      }
+
+      // Calculate totals by provider
+      const providerMap = new Map<string, ProviderCost>();
+      let totalCost = 0;
+
+      results?.forEach((result: any) => {
+        const provider = result.provider_slug || "unknown";
+        const cost = parseFloat(result.total_cost) || 0;
+        
+        totalCost += cost;
+        
+        if (providerMap.has(provider)) {
+          const existing = providerMap.get(provider)!;
+          existing.totalCost += cost;
+          existing.modelCount += 1;
+          existing.inputTokens += result.input_tokens || 0;
+          existing.outputTokens += result.output_tokens || 0;
+        } else {
+          providerMap.set(provider, {
+            provider,
+            totalCost: cost,
+            modelCount: 1,
+            inputTokens: result.input_tokens || 0,
+            outputTokens: result.output_tokens || 0,
+          });
         }
       });
 
-      const mostUsedModels = Object.entries(modelCounts)
-        .map(([name, data]) => ({
-          name,
-          ...data,
-        }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 5);
-
-      // Fetch daily queries for chart
-      const { data: dailyQueriesData } = await supabase
-        .from("search_queries")
-        .select("created_at")
-        .eq("user_id", user.id)
-        .gte("created_at", getTimeRangeDate(timeRange));
-
-      // Process daily queries
-      const dailyQueriesMap: Record<string, number> = {};
-      dailyQueriesData?.forEach((item) => {
-        const date = new Date(item.created_at).toISOString().split("T")[0];
-        dailyQueriesMap[date] = (dailyQueriesMap[date] || 0) + 1;
-      });
-
-      const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
-      const dailyQueries = [];
-      const savingsData = [];
-      const today = new Date();
-
-      for (let i = days - 1; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split("T")[0];
-        
-        dailyQueries.push({
-          date: dateStr,
-          count: dailyQueriesMap[dateStr] || 0,
-        });
-
-        // Calculate estimated savings (mock calculation based on queries)
-        const queryCount = dailyQueriesMap[dateStr] || 0;
-        const estimatedSavings = queryCount * 2.5; // €2.50 average savings per query
-        savingsData.push({
-          date: dateStr,
-          amount: Math.round(estimatedSavings * 100) / 100,
-        });
-      }
-
-      // Calculate total savings
-      const totalSavings = savingsData.reduce((sum, item) => sum + item.amount, 0);
+      const providerCosts = Array.from(providerMap.values()).sort((a, b) => b.totalCost - a.totalCost);
 
       setStats({
-        savedModels: savedModels || 0,
-        totalQueries: totalQueries || 0,
-        mostUsedModels,
-        dailyQueries,
-        savingsData,
-        totalSavings: Math.round(totalSavings * 100) / 100,
+        totalCost,
+        providerCosts,
+        recentUsage: results?.slice(0, 10) || [],
+        monthlyTrend: [],
       });
     } catch (error) {
-      console.error("Error fetching stats:", error);
-      // Fallback to empty stats on error
-      setStats({
-        savedModels: 0,
-        totalQueries: 0,
-        mostUsedModels: [],
-        dailyQueries: [],
-        savingsData: [],
-        totalSavings: 0,
-      });
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
     }
-  };
-
-  // Helper function to get date for time range
-  const getTimeRangeDate = (range: TimeRange): string => {
-    const days = range === "7d" ? 7 : range === "30d" ? 30 : 90;
-    const date = new Date();
-    date.setDate(date.getDate() - days);
-    return date.toISOString();
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Statistiken werden geladen...</p>
-        </div>
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -197,297 +132,128 @@ export default function StatsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Zurück
-                </Button>
-              </Link>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                  <BarChart3 className="w-4 h-4 text-primary-foreground" />
-                </div>
-                <span className="font-bold text-lg tracking-tight">paymodel.ai</span>
-              </div>
-            </div>
-            
-            {/* Time Range Selector */}
-            <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
-              {(["7d", "30d", "all"] as TimeRange[]).map((range) => (
-                <Button
-                  key={range}
-                  variant={timeRange === range ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setTimeRange(range)}
-                  className="min-w-[60px]"
-                >
-                  {range === "7d" ? "7 Tage" : range === "30d" ? "30 Tage" : "Allzeit"}
-                </Button>
-              ))}
-            </div>
+            <Link href="/dashboard" className="flex items-center gap-2 group">
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              <span className="font-bold text-lg">Kosten-Übersicht</span>
+            </Link>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Page Title */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">
-            Nutzungs-Statistiken
-          </h1>
-          <p className="text-muted-foreground">
-            Übersicht deiner Aktivität und Einsparungen
-          </p>
+      <div className="container mx-auto px-4 py-8">
+        {/* Time Range Selector */}
+        <div className="flex justify-center gap-2 mb-8">
+          {(["7d", "30d", "90d"] as TimeRange[]).map((range) => (
+            <button
+              key={range}
+              onClick={() => setTimeRange(range)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                timeRange === range
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted hover:bg-muted/80"
+              }`}
+            >
+              {range === "7d" ? "7 Tage" : range === "30d" ? "30 Tage" : "90 Tage"}
+            </button>
+          ))}
         </div>
 
-        {/* Key Metrics Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {/* Saved Models */}
-          <Card className="relative overflow-hidden">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                  <Bookmark className="w-5 h-5 text-blue-600" />
-                </div>
-                <Badge variant="secondary">Favoriten</Badge>
-              </div>
-              <p className="text-3xl font-bold">{stats.savedModels}</p>
-              <p className="text-sm text-muted-foreground">Gespeicherte Modelle</p>
-            </CardContent>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-400" />
-          </Card>
-
-          {/* Total Queries */}
-          <Card className="relative overflow-hidden">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                  <Search className="w-5 h-5 text-green-600" />
-                </div>
-                <Badge variant="secondary">Suchen</Badge>
-              </div>
-              <p className="text-3xl font-bold">{stats.totalQueries}</p>
-              <p className="text-sm text-muted-foreground">Suchanfragen gesamt</p>
-            </CardContent>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-green-400" />
-          </Card>
-
-          {/* Total Savings */}
-          <Card className="relative overflow-hidden">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <DollarSign className="w-5 h-5 text-amber-600" />
-                </div>
-                <Badge variant="secondary">Einsparungen</Badge>
-              </div>
-              <p className="text-3xl font-bold">€{stats.totalSavings}</p>
-              <p className="text-sm text-muted-foreground">Kosten gespart</p>
-            </CardContent>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-amber-400" />
-          </Card>
-
-          {/* Average Savings per Query */}
-          <Card className="relative overflow-hidden">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-purple-600" />
-                </div>
-                <Badge variant="secondary">Pro Such</Badge>
-              </div>
-              <p className="text-3xl font-bold">
-                €{stats.totalQueries > 0 ? (stats.totalSavings / stats.totalQueries).toFixed(2) : "0.00"}
-              </p>
-              <p className="text-sm text-muted-foreground">Ø Einsparung pro Query</p>
-            </CardContent>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-purple-400" />
-          </Card>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Daily Queries Chart */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="w-5 h-5 text-primary" />
-                Suchanfragen pro Tag
-              </CardTitle>
-              <CardDescription>
-                Anzahl der Preisvergleiche im gewählten Zeitraum
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* CSS Bar Chart */}
-              <div className="space-y-4">
-                <div className="h-48 flex items-end justify-between gap-1">
-                  {stats.dailyQueries.slice(-14).map((item, index) => {
-                    const maxCount = Math.max(...stats.dailyQueries.map(d => d.count));
-                    const height = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-                    const date = new Date(item.date);
-                    const dayLabel = date.toLocaleDateString("de-DE", { weekday: "short", day: "numeric" });
-                    
-                    return (
-                      <div key={item.date} className="flex-1 flex flex-col items-center gap-1">
-                        <div
-                          className="w-full bg-gradient-to-t from-primary to-primary/60 rounded-t-sm transition-all duration-300 hover:from-primary/80 hover:to-primary/40"
-                          style={{ height: `${height}%`, minHeight: height > 0 ? '4px' : '0' }}
-                          title={`${item.count} Suchanfragen`}
-                        />
-                        <span className="text-[10px] text-muted-foreground truncate w-full text-center">
-                          {dayLabel}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{stats.dailyQueries[0]?.date || "-"}</span>
-                  <span>{stats.dailyQueries[stats.dailyQueries.length - 1]?.date || "-"}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Most Used Models */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="w-5 h-5 text-amber-500" />
-                Meistgenutzte Modelle
-              </CardTitle>
-              <CardDescription>
-                Deine Top 5 Modelle nach Nutzung
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {stats.mostUsedModels.map((model, index) => {
-                  const maxCount = Math.max(...stats.mostUsedModels.map(m => m.count));
-                  const percentage = maxCount > 0 ? (model.count / maxCount) * 100 : 0;
-                  
-                  return (
-                    <div key={model.name} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
-                            {index + 1}
-                          </span>
-                          <div>
-                            <p className="font-medium text-sm">{model.name}</p>
-                            <p className="text-xs text-muted-foreground">{model.provider}</p>
-                          </div>
-                        </div>
-                        <Badge variant="secondary">{model.count}x</Badge>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full transition-all duration-500"
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Savings Chart */}
-        <Card className="mt-6">
+        {/* Total Cost */}
+        <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-green-600" />
-              Kosten-Einsparungen
+              <DollarSign className="w-5 h-5 text-green-500" />
+              Gesamtkosten
             </CardTitle>
             <CardDescription>
-              Deine Ersparnisse durch den Preisvergleich im Zeitraum
+              Deine API-Kosten im gewählten Zeitraum
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* CSS Line Chart for Savings */}
-            <div className="space-y-4">
-              <div className="h-48 relative flex items-end justify-between gap-1">
-                {stats.savingsData.slice(-14).map((item, index) => {
-                  const maxAmount = Math.max(...stats.savingsData.map(d => d.amount));
-                  const height = maxAmount > 0 ? (item.amount / maxAmount) * 100 : 0;
-                  const date = new Date(item.date);
-                  const dayLabel = date.toLocaleDateString("de-DE", { weekday: "short", day: "numeric" });
-                  
-                  return (
-                    <div key={item.date} className="flex-1 flex flex-col items-center gap-1">
-                      <div className="relative group w-full flex justify-center">
-                        <div
-                          className="w-full max-w-[30px] bg-gradient-to-t from-green-500 to-green-400 rounded-t-md transition-all duration-300 hover:from-green-600 hover:to-green-500"
-                          style={{ height: `${height}%`, minHeight: height > 0 ? '4px' : '0' }}
-                        />
-                        <div className="absolute bottom-full mb-2 hidden group-hover:block bg-popover border rounded px-2 py-1 text-xs shadow-lg whitespace-nowrap z-10">
-                          €{item.amount}
-                        </div>
-                      </div>
-                      <span className="text-[10px] text-muted-foreground truncate w-full text-center">
-                        {dayLabel}
-                      </span>
+            <p className="text-4xl font-bold text-green-500">
+              €{stats.totalCost.toFixed(2)}
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Provider Breakdown */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5" />
+              Kosten nach Anbieter
+            </CardTitle>
+            <CardDescription>
+              Aufschlüsselung deiner Ausgaben pro Provider
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {stats.providerCosts.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                Noch keine Benchmark-Ergebnisse. Starte einen Benchmark um Kosten zu tracken.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {stats.providerCosts.map((provider) => (
+                  <div key={provider.provider} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                    <div>
+                      <p className="font-medium capitalize">{provider.provider}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {provider.modelCount} Anfragen • {(provider.inputTokens + provider.outputTokens).toLocaleString()} Tokens
+                      </p>
                     </div>
-                  );
-                })}
+                    <p className="font-bold text-green-500">€{provider.totalCost.toFixed(2)}</p>
+                  </div>
+                ))}
               </div>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{stats.savingsData[0]?.date || "-"}</span>
-                <span>Gesamt: <strong>€{stats.totalSavings}</strong></span>
-                <span>{stats.savingsData[stats.savingsData.length - 1]?.date || "-"}</span>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Summary Stats */}
-        <Card className="mt-6 bg-gradient-to-r from-primary/5 via-primary/10 to-background border-primary/20">
-          <CardContent className="pt-6">
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                  <Calendar className="w-6 h-6 text-primary" />
-                </div>
-                <p className="text-2xl font-bold">
-                  {timeRange === "7d" ? "7" : timeRange === "30d" ? "30" : "90"}
-                </p>
-                <p className="text-sm text-muted-foreground">Tage aktiv</p>
+        {/* Recent Usage */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              Letzte Nutzung
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {stats.recentUsage.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                Keine Nutzung in diesem Zeitraum
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {stats.recentUsage.map((usage: any, index: number) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium">{usage.model_slug}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(usage.created_at).toLocaleDateString("de-DE", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">€{parseFloat(usage.total_cost || 0).toFixed(4)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {(usage.input_tokens + usage.output_tokens).toLocaleString()} Tokens
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-3">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
-                </div>
-                <p className="text-2xl font-bold">
-                  {timeRange === "7d" ? "1.4" : timeRange === "30d" ? "6.7" : "20.2"}
-                </p>
-                <p className="text-sm text-muted-foreground">Ø Vergleiche pro Tag</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-3">
-                  <DollarSign className="w-6 h-6 text-amber-600" />
-                </div>
-                <p className="text-2xl font-bold">
-                  €{timeRange === "7d" ? "150" : timeRange === "30d" ? "420" : "980"}
-                </p>
-                <p className="text-sm text-muted-foreground">Ø Monatliche Ersparnis</p>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t mt-12 py-6">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2026 paymodel.ai – Alle Rechte vorbehalten.</p>
-        </div>
-      </footer>
+      </div>
     </div>
   );
 }

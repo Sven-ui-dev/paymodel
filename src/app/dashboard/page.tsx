@@ -115,6 +115,7 @@ export default function DashboardPage() {
     logout: locale === "de" ? "Abmelden" : "Logout",
     priceComparison: locale === "de" ? "Preisvergleich" : "Price Comparison",
     costCalculator: locale === "de" ? "Kostenrechner" : "Cost Calculator",
+    costOverview: locale === "de" ? "Kosten-Übersicht" : "Cost Overview",
     settings: locale === "de" ? "Einstellungen" : "Settings",
     benchmark: locale === "de" ? "Benchmark" : "Benchmark",
     priceAlerts: locale === "de" ? "Preisbenachrichtigungen" : "Price Alerts",
@@ -457,6 +458,15 @@ export default function DashboardPage() {
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
                 Kostenrechner
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full justify-start text-xs sm:text-sm"
+                onClick={() => router.push("/dashboard/stats")}
+              >
+                <BarChart3 className="w-4 h-4 mr-2" />
+                {t.costOverview}
               </Button>
 
               <Button
