@@ -56,6 +56,7 @@ export default function Home() {
     teamSavingsDesc: "Zeige deinem Team, wie viel ihr durch den Modellwechsel spart.",
     waitlistTitle: "Early Access",
     waitlistDesc: "Sichere dir kostenlosen Zugang zum Preisvergleich.",
+    waitlistFullDesc: "Sichere dir kostenlosen Zugang zum Preisvergleich und werde als Erster benachrichtigt, wenn der personalisierte Benchmark-Service startet.",
     waitlistSuccess: "Vielen Dank! Du bist auf der Warteliste.",
     noSpam: "Kein Spam. Abmeldung jederzeit.",
     joinWaitlist: "Auf die Warteliste",
@@ -102,6 +103,7 @@ export default function Home() {
     teamSavingsDesc: "Show your team how much you save by switching models.",
     waitlistTitle: "Early Access",
     waitlistDesc: "Get free access to the price comparison and be the first to know.",
+    waitlistFullDesc: "Get free access to the price comparison and be the first to know when the personalized benchmark service launches.",
     waitlistSuccess: "Thank you! You're on the waitlist.",
     noSpam: "No spam. Unsubscribe anytime.",
     joinWaitlist: "Join Waitlist",
@@ -553,7 +555,7 @@ export default function Home() {
           <div className="container mx-auto max-w-xl text-center">
             <h3 className="text-2xl font-bold mb-4">{t.waitlistTitle}</h3>
             <p className="text-muted-foreground mb-6">
-              Sichere dir kostenlosen Zugang zum Preisvergleich und werde als Erster benachrichtigt, wenn der personalisierte Benchmark-Service startet.
+              {t.waitlistFullDesc || t.waitlistDesc}
             </p>
             <form onSubmit={handleWaitlistSubmit} className="flex gap-2 justify-center">
               <Input 
@@ -566,7 +568,7 @@ export default function Home() {
                 required
               />
               <Button type="submit" disabled={waitlistLoading}>
-                {waitlistLoading ? '...' : 'Anmelden'}
+                {waitlistLoading ? '...' : (locale === "de" ? "Anmelden" : "Sign Up")}
               </Button>
             </form>
             {waitlistMessage && (
