@@ -406,8 +406,8 @@ export default function Home() {
                   return (
                     <div
                       key={model.model_id}
-                      className={`flex items-center justify-between p-4 rounded-lg ${
-                        index === 0 ? "bg-primary/10 border border-primary/20" : "bg-muted/50"
+                      className={`flex items-center justify-between p-4 rounded-lg border ${
+                        index === 0 ? "bg-primary/10 border-primary/20" : "bg-muted/50 border-transparent"
                       }`}
                     >
                       <div>
