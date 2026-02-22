@@ -111,6 +111,9 @@ export function Navbar({ user }: NavbarProps) {
                 <Button size="sm" asChild>
                   <Link href="/#waitlist">{nav.earlyAccess}</Link>
                 </Button>
+                <Button variant="ghost" size="sm" onClick={() => setLocale(locale === "de" ? "en" : "de")}>
+                  {locale === "de" ? "EN" : "DE"}
+                </Button>
               </>
             )}
           </div>
