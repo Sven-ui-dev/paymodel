@@ -7,6 +7,7 @@ import { ExternalLink, Star, StarOff, ChevronDown, ChevronUp, Bell } from "lucid
 import type { CurrentPrice } from "@/lib/supabase";
 import { CreatePriceAlertModal } from "@/components/CreatePriceAlertModal";
 import { getProviderLogo, getProviderColor } from "@/lib/providerLogos";
+import { useLocale } from "@/components/LocaleProvider";
 
 interface ModelTableProps {
   models: CurrentPrice[];
@@ -25,6 +26,9 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [selectedModel, setSelectedModel] = useState<CurrentPrice | null>(null);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const { locale } = useLocale();
+  
+  const contextLabel = locale === "de" ? "Kontext" : "Context";
 
   const handleSort = (field: keyof CurrentPrice) => {
     if (sortField === field) {
@@ -147,7 +151,7 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
           <p className="font-medium">{formatPrice(model.output_price_per_million)}</p>
         </div>
         <div>
-          <span className="text-muted-foreground text-xs">Kontext</span>
+          <span className="text-muted-foreground text-xs">{contextLabel}</span>
           <p className="font-medium">{formatContext(model.context_window)}</p>
         </div>
         <div>
@@ -237,7 +241,7 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
                 onClick={() => handleSort("context_window")}
               >
                 <div className="flex items-center justify-end gap-1">
-                  Kontext
+                  {contextLabel}
                   {sortField === "context_window" && (
                     sortDirection === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
                   )}
