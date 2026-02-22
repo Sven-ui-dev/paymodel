@@ -240,7 +240,7 @@ export default function Home() {
             
             <div className="flex justify-center gap-4 mb-8">
               <a href="/login?register=true">
-                <Button size="lg">{t.getStarted}</Button>
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700">{t.getStarted}</Button>
               </a>
             </div>
             
