@@ -513,7 +513,7 @@ export default function Home() {
                 </div>
               </div>
               
-              <div className="flex gap-4 p-4">
+              <a href="/dashboard" className="flex gap-4 p-4 rounded-lg border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10">
                 <div 
                   className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
                   style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
@@ -524,7 +524,7 @@ export default function Home() {
                   <h4 className="font-semibold mb-1">{t.costDashboard}</h4>
                   <p className="text-sm text-muted-foreground">{t.trackSpendingDesc}</p>
                 </div>
-              </div>
+              </a>
               
               <div className="flex gap-4 p-4">
                 <div 
