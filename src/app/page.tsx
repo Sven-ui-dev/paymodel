@@ -421,6 +421,7 @@ export default function Home() {
               <div className="space-y-3">
                 {sortedModels.slice(0, 10).map((model, index) => {
                   const totalCost = calculateCost(model.input_price_per_million) + calculateCost(model.output_price_per_million);
+                  const logoUrl = getProviderLogo(model.provider_slug);
                   return (
                     <div
                       key={model.model_id}
@@ -428,9 +429,19 @@ export default function Home() {
                         index === 0 ? "bg-primary/10 border-primary/20" : "bg-muted/50 border-border"
                       }`}
                     >
-                      <div>
-                        <p className="font-medium">{model.model_name}</p>
-                        <p className="text-sm text-muted-foreground">{model.provider_name}</p>
+                      <div className="flex items-center gap-3">
+                        {logoUrl && (
+                          <img 
+                            src={logoUrl} 
+                            alt={model.provider_name}
+                            className="w-8 h-8 object-contain"
+                            style={{ filter: 'brightness(0) invert(1)' }}
+                          />
+                        )}
+                        <div>
+                          <p className="font-medium">{model.model_name}</p>
+                          <p className="text-sm text-muted-foreground">{model.provider_name}</p>
+                        </div>
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-lg">€{totalCost.toFixed(2)}/Mo</p>
