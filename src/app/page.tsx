@@ -66,6 +66,13 @@ export default function Home() {
     calculatorSubtitle: "Gib dein monatliches Volumen ein und sieh sofort, welches Modell für dich am günstigsten ist.",
     livePriceComparison: "Live-Preisvergleich",
     personalizedBenchmarks: "Personalisierte Benchmarks",
+    personalizedBenchmarksDesc: "Lade deine eigenen Prompts hoch und teste sie gegen alle Modelle.",
+    costDashboard: "Kosten-Dashboard",
+    priceAlerts: "Preis-Alerts",
+    priceAlertsDesc: "Werde sofort benachrichtigt, wenn sich Preise ändern.",
+    roiReports: "ROI-Reports",
+    dsgvo: "DSGVO-konform",
+    dsgvoDesc: "Hosting in der EU, keine Weitergabe deiner Prompts.",
   } : {
     heroTitle: "Compare AI Models & Save",
     heroSubtitle: "Find the cheapest AI models for your use cases",
@@ -105,6 +112,13 @@ export default function Home() {
     calculatorSubtitle: "Enter your monthly volume and see which model is cheapest for you.",
     livePriceComparison: "Live Price Comparison",
     personalizedBenchmarks: "Personalized Benchmarks",
+    personalizedBenchmarksDesc: "Upload your own prompts and test them against all models.",
+    costDashboard: "Cost Dashboard",
+    priceAlerts: "Price Alerts",
+    priceAlertsDesc: "Get notified immediately when prices change.",
+    roiReports: "ROI Reports",
+    dsgvo: "GDPR compliant",
+    dsgvoDesc: "Hosted in the EU, no sharing of your prompts.",
   };
 
   useEffect(() => {
@@ -462,9 +476,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">{t.livePriceComparison}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Aktuelle Token-Preise aller großen Anbieter. Automatisch aktualisiert, transparent aufbereitet.
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t.realTimePricesDesc}</p>
                 </div>
               </div>
               
@@ -477,9 +489,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">{t.personalizedBenchmarks}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Lade deine eigenen Prompts hoch und teste sie gegen alle Modelle.
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t.personalizedBenchmarksDesc}</p>
                 </div>
               </div>
               
@@ -491,10 +501,8 @@ export default function Home() {
                   <TrendingUp className="w-5 h-5" style={{ color: '#2ECC71' }} />
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-1">Kosten-Dashboard</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Verbinde deine API-Keys und sieh in Echtzeit, wo dein Geld hinfließt.
-                  </p>
+                  <h4 className="font-semibold mb-1">{t.costDashboard}</h4>
+                  <p className="text-sm text-muted-foreground">{t.trackSpendingDesc}</p>
                 </div>
               </div>
               
@@ -506,10 +514,8 @@ export default function Home() {
                   <Bell className="w-5 h-5" style={{ color: '#2ECC71' }} />
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-1">Preis-Alerts</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Werde sofort benachrichtigt, wenn sich Preise ändern.
-                  </p>
+                  <h4 className="font-semibold mb-1">{t.priceAlerts}</h4>
+                  <p className="text-sm text-muted-foreground">{t.priceAlertsDesc}</p>
                 </div>
               </div>
               
@@ -521,10 +527,8 @@ export default function Home() {
                   <Shield className="w-5 h-5" style={{ color: '#2ECC71' }} />
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-1">ROI-Reports</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Zeige deinem Team, wie viel ihr durch den Modellwechsel spart.
-                  </p>
+                  <h4 className="font-semibold mb-1">{t.roiReports}</h4>
+                  <p className="text-sm text-muted-foreground">{t.teamSavingsDesc}</p>
                 </div>
               </div>
               
@@ -536,10 +540,8 @@ export default function Home() {
                   <Shield className="w-5 h-5" style={{ color: '#2ECC71' }} />
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-1">DSGVO-konform</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Hosting in der EU, keine Weitergabe deiner Prompts.
-                  </p>
+                  <h4 className="font-semibold mb-1">{t.dsgvo}</h4>
+                  <p className="text-sm text-muted-foreground">{t.dsgvoDesc}</p>
                 </div>
               </div>
             </div>
