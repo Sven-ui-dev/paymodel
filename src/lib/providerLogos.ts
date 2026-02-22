@@ -7,7 +7,7 @@ export const providerLogos: Record<string, string> = {
   'anthropic-claude': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/anthropic.svg',
   'google': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/google.svg',
   'google-gemini': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/googlecloud.svg',
-  'mistral': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/mistral.svg',
+  'mistral': 'https://docs.mistral.ai/img/logo.svg',
   'deepseek': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/deepseek.svg',
   'groq': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/groq.svg',
   'xai': 'https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/x.svg',
