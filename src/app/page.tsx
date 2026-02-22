@@ -74,6 +74,10 @@ export default function Home() {
     roiReports: "ROI-Reports",
     dsgvo: "DSGVO-konform",
     dsgvoDesc: "Hosting in der EU, keine Weitergabe deiner Prompts.",
+    footerRights: "Alle Rechte vorbehalten.",
+    impressum: "Impressum",
+    datenschutz: "Datenschutz",
+    kontakt: "Kontakt",
   } : {
     heroTitle: "Compare AI Models & Save",
     heroSubtitle: "Find the cheapest AI models for your use cases",
@@ -121,6 +125,10 @@ export default function Home() {
     roiReports: "ROI Reports",
     dsgvo: "GDPR compliant",
     dsgvoDesc: "Hosted in the EU, no sharing of your prompts.",
+    footerRights: "All rights reserved.",
+    impressum: "Imprint",
+    datenschutz: "Privacy",
+    kontakt: "Contact",
   };
 
   useEffect(() => {
@@ -595,11 +603,11 @@ export default function Home() {
         {/* Footer */}
         <footer className="border-t py-8 px-4">
           <div className="container mx-auto text-center text-sm text-muted-foreground">
-            <p>© 2026 paymodel.ai – Alle Rechte vorbehalten.</p>
+            <p>© 2026 paymodel.ai – {t.footerRights}</p>
             <div className="flex justify-center gap-4 mt-2">
-              <Link href="/impressum" className="hover:underline">Impressum</Link>
-              <Link href="/datenschutz" className="hover:underline">Datenschutz</Link>
-              <Link href="/contact" className="hover:underline">Kontakt</Link>
+              <Link href="/impressum" className="hover:underline">{t.impressum}</Link>
+              <Link href="/datenschutz" className="hover:underline">{t.datenschutz}</Link>
+              <Link href="/contact" className="hover:underline">{t.kontakt}</Link>
               <a href="mailto:info@paymodel.ai" className="hover:underline">info@paymodel.ai</a>
             </div>
           </div>
