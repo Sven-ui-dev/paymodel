@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, X, Sparkles, LogOut } from "lucide-react";
 import { useLocale } from "@/components/LocaleProvider";
+import { createClient } from "@/lib/supabase/client";
 
 interface NavbarProps {
   user?: any;
@@ -13,6 +15,13 @@ interface NavbarProps {
 export function Navbar({ user }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { locale, setLocale } = useLocale();
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.refresh();
+  };
 
   const nav = locale === "de" ? {
     priceComparison: "Preisvergleich",
@@ -21,6 +30,7 @@ export function Navbar({ user }: NavbarProps) {
     apiDocs: "API Doku",
     dashboard: "Dashboard",
     login: "Login",
+    logout: "Abmelden",
     earlyAccess: "Early Access",
   } : {
     priceComparison: "Price Comparison",
@@ -29,6 +39,7 @@ export function Navbar({ user }: NavbarProps) {
     apiDocs: "API Docs",
     dashboard: "Dashboard",
     login: "Login",
+    logout: "Logout",
     earlyAccess: "Early Access",
   };
 
@@ -83,14 +94,25 @@ export function Navbar({ user }: NavbarProps) {
 
           {/* Desktop Actions */}
           <div className="hidden sm:flex items-center gap-3">
-            <Button variant="outline" size="sm" asChild>
-              <Link href={user ? "/dashboard" : "/login"}>
-                {user ? nav.dashboard : nav.login}
-              </Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link href="/#waitlist">{nav.earlyAccess}</Link>
-            </Button>
+            {user ? (
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/dashboard">{nav.dashboard}</Link>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  {nav.logout}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/login">{nav.login}</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/#waitlist">{nav.earlyAccess}</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -145,13 +167,25 @@ export function Navbar({ user }: NavbarProps) {
           </Button>
           
           {user ? (
-                <Link 
-                  href="/dashboard" 
-                  className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {nav.dashboard}
-                </Link>
+                <>
+                  <Link 
+                    href="/dashboard" 
+                    className="px-3 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {nav.dashboard}
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start px-3 py-2 text-sm font-medium"
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    {nav.logout}
+                  </Button>
+                </>
               ) : (
                 <>
                   <Link 
