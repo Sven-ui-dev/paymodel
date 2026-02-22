@@ -300,6 +300,100 @@ export default function ApiDocsPage() {
           </div>
         </section>
 
+        {/* Proxy Endpoint */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-4">API Proxy</h2>
+          <p className="text-muted-foreground mb-6">
+            Nutze den API Proxy um Anfragen an AI-Provider zu senden und Kosten automatisch zu tracken. 
+            Deine API-Keys werden aus deinem Profil verwendet.
+          </p>
+
+          <EndpointCard
+            method="POST"
+            path="/api/proxy"
+            description="Leite Anfragen an AI-Provider weiter und tracke die Kosten automatisch."
+            id="api-proxy"
+            example={`curl -X POST "https://paymodel.ai/api/proxy" \\
+  -H "Authorization: Bearer pk_your_session_token" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "provider": "openai",
+    "model": "gpt-4",
+    "messages": [{"role": "user", "content": "Hallo"}]
+  }'`}
+          />
+
+          <h3 className="text-lg font-semibold mb-2 mt-8">Request-Body:</h3>
+          <div className="overflow-x-auto mb-6">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 px-4">Parameter</th>
+                  <th className="text-left py-2 px-4">Typ</th>
+                  <th className="text-left py-2 px-4">Beschreibung</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b">
+                  <td className="py-2 px-4 font-mono text-xs">provider</td>
+                  <td className="py-2 px-4">string</td>
+                  <td className="py-2 px-4">Provider: openrouter, openai, anthropic, google</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2 px-4 font-mono text-xs">model</td>
+                  <td className="py-2 px-4">string</td>
+                  <td className="py-2 px-4">Model-ID (z.B. gpt-4, claude-3-sonnet)</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2 px-4 font-mono text-xs">messages</td>
+                  <td className="py-2 px-4">array</td>
+                  <td className="py-2 px-4">Array von Chat-Nachrichten</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2 px-4 font-mono text-xs">max_tokens</td>
+                  <td className="py-2 px-4">number</td>
+                  <td className="py-2 px-4">Max. Output-Tokens (optional, Standard: 1024)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="text-lg font-semibold mb-2 mt-8">Unterstützte Provider:</h3>
+          <div className="overflow-x-auto mb-6">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 px-4">Provider</th>
+                  <th className="text-left py-2 px-4">Model-Beispiele</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b">
+                  <td className="py-2 px-4">openrouter</td>
+                  <td className="py-2 px-4">openai/gpt-4, anthropic/claude-3-sonnet, google/gemini-pro</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2 px-4">openai</td>
+                  <td className="py-2 px-4">gpt-4, gpt-4-turbo, gpt-3.5-turbo</td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2 px-4">anthropic</td>
+                  <td className="py-2 px-4">claude-3-opus, claude-3-sonnet, claude-3-haiku</td>
+                </tr>
+                <tr>
+                  <td className="py-2 px-4">google</td>
+                  <td className="py-2 px-4">gemini-pro, gemini-pro-vision</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="text-lg font-semibold mb-2 mt-8">Kosten-Tracking:</h3>
+          <p className="text-muted-foreground mb-4">
+            Alle Anfragen werden automatisch in der Datenbank erfasst. Sieh deine Kosten im Dashboard unter "Kosten-Übersicht".
+          </p>
+        </section>
+
         {/* SDKs */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">SDKs</h2>
