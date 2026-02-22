@@ -248,38 +248,50 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-6">
               {/* Preisvergleich */}
               <a href="#preisvergleich" className="group p-6 rounded-xl border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10">
-                <div 
-                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
-                >
-                  <BarChart3 className="w-6 h-6" style={{ color: '#2ECC71' }} />
+                <div className="flex items-start gap-4">
+                  <div 
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
+                    style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                  >
+                    <BarChart3 className="w-6 h-6" style={{ color: '#2ECC71' }} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">{t.priceComparison}</h3>
+                    <p className="text-sm text-muted-foreground">{t.priceComparisonDesc}</p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{t.priceComparison}</h3>
-                <p className="text-sm text-muted-foreground">{t.priceComparisonDesc}</p>
               </a>
 
               {/* Kostenrechner */}
               <a href="#kostenrechner" className="group p-6 rounded-xl border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10">
-                <div 
-                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
-                >
-                  <DollarSign className="w-6 h-6" style={{ color: '#2ECC71' }} />
+                <div className="flex items-start gap-4">
+                  <div 
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
+                    style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                  >
+                    <DollarSign className="w-6 h-6" style={{ color: '#2ECC71' }} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">{t.costCalculator}</h3>
+                    <p className="text-sm text-muted-foreground">{t.costCalculatorDesc}</p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{t.costCalculator}</h3>
-                <p className="text-sm text-muted-foreground">{t.costCalculatorDesc}</p>
               </a>
 
               {/* Benchmark */}
               <a href="#benchmark" className="group p-6 rounded-xl border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10">
-                <div 
-                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                  style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
-                >
-                  <Zap className="w-6 h-6" style={{ color: '#2ECC71' }} />
+                <div className="flex items-start gap-4">
+                  <div 
+                    className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform"
+                    style={{ backgroundColor: 'rgba(46, 204, 113, 0.1)' }}
+                  >
+                    <Zap className="w-6 h-6" style={{ color: '#2ECC71' }} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">{t.benchmark}</h3>
+                    <p className="text-sm text-muted-foreground">{t.benchmarkDesc}</p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{t.benchmark}</h3>
-                <p className="text-sm text-muted-foreground">{t.benchmarkDesc}</p>
               </a>
             </div>
           </div>
