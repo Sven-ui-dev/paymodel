@@ -379,7 +379,7 @@ export default function Home() {
             </div>
 
             <div className="bg-card rounded-xl p-6 shadow-sm">
-              <div className="grid grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">{t.inputLabel}</label>
                   <input
