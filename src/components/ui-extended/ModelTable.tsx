@@ -273,14 +273,13 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
                     <img 
                       src={getProviderLogo(model.provider_slug) || ''} 
                       alt={model.provider_name}
-                      style={{ width: '160px', height: '40px', display: getProviderLogo(model.provider_slug) ? 'block' : 'none' }}
+                      className="h-6 w-auto object-contain"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
                     <span 
                       className="text-sm"
-                      style={{ display: getProviderLogo(model.provider_slug) ? 'none' : 'inline' }}
                     >
                       {model.provider_name}
                     </span>
