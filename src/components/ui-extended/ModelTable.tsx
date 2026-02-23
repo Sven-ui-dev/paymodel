@@ -72,6 +72,7 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
     coding: "bg-purple-100 text-purple-800 border-purple-300",
     reasoning: "bg-orange-100 text-orange-800 border-orange-300",
     vision: "bg-green-100 text-green-800 border-green-300",
+    audio: "bg-pink-100 text-pink-800 border-pink-300",
   };
 
   const MobileCardView = ({ model }: { model: CurrentPrice }) => (
@@ -158,7 +159,7 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
           <span className="text-muted-foreground text-xs">Features</span>
           <div className="flex gap-1 flex-wrap mt-1">
             {model.capabilities?.slice(0, 2).map((cap) => (
-              <Badge key={cap} variant="secondary" className="text-xs px-1.5 py-0">
+              <Badge key={cap} className={`text-xs px-1.5 py-0 border ${capabilityColors[cap] || "bg-muted"}`}>
                 {cap}
               </Badge>
             ))}
@@ -297,7 +298,7 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
                 <td className="p-3 hidden lg:table-cell">
                   <div className="flex gap-1 flex-wrap">
                     {model.capabilities?.slice(0, 3).map((cap) => (
-                      <Badge key={cap} variant="secondary" className={`text-xs ${capabilityColors[cap] || ""}`}>
+                      <Badge key={cap} className={`text-xs border ${capabilityColors[cap] || "bg-muted"}`}>
                         {cap}
                       </Badge>
                     ))}
