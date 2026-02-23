@@ -274,7 +274,7 @@ function ModelTableWithModal({ models, favorites, onFavorite, compact = false, u
                     <img 
                       src={getProviderLogo(model.provider_slug) || ''} 
                       alt={model.provider_name}
-                      className="h-6 w-auto object-contain"
+                      className="h-6 w-auto object-contain bg-white/10 rounded p-0.5"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
