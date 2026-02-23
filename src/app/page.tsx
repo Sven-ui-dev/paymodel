@@ -442,7 +442,7 @@ export default function Home() {
                           <img 
                             src={logoUrl} 
                             alt={model.provider_name}
-                            className="w-10 h-10 object-contain rounded"
+                            className="w-8 h-8 object-contain rounded"
                           />
                         )}
                         <div>
