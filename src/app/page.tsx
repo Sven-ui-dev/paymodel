@@ -442,12 +442,12 @@ export default function Home() {
                           <img 
                             src={logoUrl} 
                             alt={model.provider_name}
-                            className="w-8 h-8 object-contain p-1 rounded"
+                            className="w-6 h-6 object-contain rounded-sm"
                           />
                         )}
-                        <div>
-                          <p className="font-medium">{model.model_name}</p>
-                          <p className="text-sm text-muted-foreground">{model.provider_name}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{model.model_name}</p>
+                          <p className="text-sm text-muted-foreground truncate">{model.provider_name}</p>
                         </div>
                       </div>
                       <div className="text-right">
